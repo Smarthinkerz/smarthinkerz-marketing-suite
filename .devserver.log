@@ -1,0 +1,66 @@
+▲ Next.js 16.2.7 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://169.254.0.21:3000
+- Environments: .env.local
+✓ Ready in 502ms
+Attention: Next.js now collects completely anonymous telemetry regarding usage.
+This information is used to shape Next.js' roadmap and prioritize features.
+You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+https://nextjs.org/telemetry
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+
+○ Compiling / ...
+ GET / 200 in 9.8s (next.js: 8.8s, proxy.ts: 129ms, application-code: 940ms)
+ GET /pricing 200 in 789ms (next.js: 597ms, proxy.ts: 9ms, application-code: 184ms)
+ GET /dashboard 200 in 2.5s (next.js: 2.3s, proxy.ts: 5ms, application-code: 258ms)
+ GET /admin 200 in 868ms (next.js: 691ms, proxy.ts: 4ms, application-code: 173ms)
+ GET /auth/sign-in 200 in 733ms (next.js: 605ms, proxy.ts: 5ms, application-code: 123ms)
+ GET /dashboard 200 in 119ms (next.js: 6ms, proxy.ts: 5ms, application-code: 108ms)
+⚠ Blocked cross-origin request to Next.js dev resource /_next/webpack-hmr from "3000-ipqzn41zn6i3ao52hzbfn-ccc8dd8f.sg1.manus.computer".
+Cross-origin access to Next.js dev resources is blocked by default for safety.
+
+To allow this host in development, add it to "allowedDevOrigins" in next.config.js and restart the dev server:
+
+// next.config.js
+module.exports = {
+  allowedDevOrigins: ['3000-ipqzn41zn6i3ao52hzbfn-ccc8dd8f.sg1.manus.computer'],
+}
+
+Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/allowedDevOrigins
+✓ Compiled in 355ms
+✓ Compiled in 56ms
+✓ Compiled in 35ms
+✓ Compiled in 35ms
+✓ Compiled in 29ms
+✓ Compiled in 29ms
+ GET / 200 in 711ms (next.js: 85ms, proxy.ts: 35ms, application-code: 592ms)
+ GET / 200 in 167ms (next.js: 12ms, proxy.ts: 7ms, application-code: 148ms)
+ GET /admin/cms 200 in 3.0s (next.js: 2.8s, proxy.ts: 6ms, application-code: 220ms)
+ GET / 200 in 172ms (next.js: 6ms, proxy.ts: 5ms, application-code: 160ms)
+ GET /pricing 200 in 298ms (next.js: 72ms, proxy.ts: 4ms, application-code: 221ms)
+ GET /dashboard 200 in 394ms (next.js: 106ms, proxy.ts: 4ms, application-code: 284ms)
+ GET /admin 200 in 135ms (next.js: 39ms, proxy.ts: 4ms, application-code: 92ms)
+ HEAD / 200 in 168ms (next.js: 6ms, proxy.ts: 5ms, application-code: 157ms)
+ GET / 200 in 170ms (next.js: 7ms, proxy.ts: 7ms, application-code: 156ms)
+ GET / 200 in 140ms (next.js: 4ms, proxy.ts: 5ms, application-code: 132ms)
+ GET / 200 in 137ms (next.js: 3ms, proxy.ts: 3ms, application-code: 130ms)
+ GET / 200 in 114ms (next.js: 4ms, proxy.ts: 3ms, application-code: 107ms)
+ GET /pricing 200 in 118ms (next.js: 3ms, proxy.ts: 3ms, application-code: 111ms)
+ GET /dashboard 200 in 76ms (next.js: 3ms, proxy.ts: 3ms, application-code: 71ms)
+ GET /admin 200 in 74ms (next.js: 3ms, proxy.ts: 3ms, application-code: 69ms)
+ GET /admin/cms 200 in 60ms (next.js: 3ms, proxy.ts: 3ms, application-code: 54ms)
+ GET /dashboard/content 200 in 2.2s (next.js: 2.1s, proxy.ts: 3ms, application-code: 93ms)
+ HEAD / 200 in 170ms (next.js: 8ms, proxy.ts: 20ms, application-code: 143ms)
+ GET / 200 in 129ms (next.js: 3ms, proxy.ts: 3ms, application-code: 124ms)
+ GET / 200 in 121ms (next.js: 3ms, proxy.ts: 3ms, application-code: 114ms)
+ GET /pricing 200 in 106ms (next.js: 6ms, proxy.ts: 3ms, application-code: 96ms)
+ GET /demo 200 in 1802ms (next.js: 1692ms, proxy.ts: 3ms, application-code: 107ms)
+ GET /contact 200 in 986ms (next.js: 857ms, proxy.ts: 4ms, application-code: 125ms)
+✓ Compiled in 325ms
+✓ Compiled in 55ms
+✓ Compiled in 41ms
+✓ Compiled in 32ms
+✓ Compiled in 36ms
+✓ Compiled in 30ms
+✓ Compiled in 52ms
