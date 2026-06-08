@@ -11,11 +11,6 @@ const inter = Inter({
 
 const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME ?? "SmarThinkerz Marketing Suite";
 
-// Next 15.5.4 has a known bug (NEXT-4720) where statically exporting the
-// built-in /404 and /_error pages crashes with a null React context. Forcing
-// dynamic rendering at the root skips that static export and avoids the crash.
-export const dynamic = "force-dynamic";
-
 export const metadata: Metadata = {
   title: {
     default: `${APP_NAME} — AI-Powered Marketing Platform You Control`,

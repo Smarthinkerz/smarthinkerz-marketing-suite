@@ -32,8 +32,8 @@ export default function DemoPage() {
 
           <div className="mt-14 grid gap-5 sm:grid-cols-2">
             {TOOLS.map((tool) => (
-              <div key={tool.key} className="rounded-2xl border border-border bg-surface p-6">
-                <div className={`inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${tool.accent} text-white`}>
+              <div key={tool.key} className="rounded-lg border border-border bg-surface p-6">
+                <div className="inline-flex h-11 w-11 items-center justify-center rounded-md bg-surface-2 text-primary">
                   <Icon name={tool.icon} className="h-5 w-5" />
                 </div>
                 <h3 className="mt-4 text-lg font-semibold text-foreground">{tool.name}</h3>

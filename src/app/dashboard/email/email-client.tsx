@@ -67,7 +67,7 @@ export function EmailClient() {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="rounded-full gradient-brand px-5 py-2 text-sm font-semibold text-white">
+            <span className="rounded-md bg-primary px-5 py-2 text-sm font-semibold text-primary-foreground">
               {data.cta}
             </span>
             <span className="text-xs text-muted">← suggested CTA button</span>

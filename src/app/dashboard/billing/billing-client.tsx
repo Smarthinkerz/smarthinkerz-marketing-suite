@@ -69,7 +69,7 @@ export function BillingClient({
           {limit !== null && (
             <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-surface-2">
               <div
-                className={`h-full rounded-full transition-all ${pct >= 90 ? "bg-error" : pct >= 70 ? "bg-warning" : "gradient-brand"}`}
+                className={`h-full rounded-full transition-all ${pct >= 90 ? "bg-error" : pct >= 70 ? "bg-warning" : "bg-primary"}`}
                 style={{ width: `${pct}%` }}
               />
             </div>
@@ -83,13 +83,13 @@ export function BillingClient({
           title="Change plan"
           subtitle="Upgrade or downgrade anytime. Secure checkout via our payment hub."
           action={
-            <div className="flex rounded-full border border-border p-1">
+            <div className="flex rounded-md border border-border p-1">
               {(["monthly", "yearly"] as BillingCycle[]).map((c) => (
                 <button
                   key={c}
                   onClick={() => setCycle(c)}
-                  className={`rounded-full px-3 py-1 text-xs font-semibold capitalize transition-colors ${
-                    cycle === c ? "gradient-brand text-white" : "text-muted"
+                  className={`rounded px-3 py-1 text-xs font-semibold capitalize transition-colors ${
+                    cycle === c ? "bg-primary text-primary-foreground" : "text-muted"
                   }`}
                 >
                   {c}
@@ -120,7 +120,7 @@ export function BillingClient({
             return (
               <div
                 key={p.id}
-                className={`relative rounded-2xl border p-5 ${
+                className={`relative rounded-lg border p-5 ${
                   isCurrent ? "border-primary ring-1 ring-primary/30" : "border-border"
                 }`}
               >

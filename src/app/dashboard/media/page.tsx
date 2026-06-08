@@ -19,7 +19,6 @@ export default async function MediaPage() {
         title={meta.name}
         description="Generate marketing images and visuals with AI."
         icon={meta.icon}
-        accent={meta.accent}
       />
       <MediaClient />
     </div>

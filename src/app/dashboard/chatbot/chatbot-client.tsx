@@ -81,7 +81,7 @@ export function ChatbotClient() {
             <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto pr-1">
               {messages.length === 0 && (
                 <div className="flex h-full flex-col items-center justify-center text-center text-muted">
-                  <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <span className="flex h-14 w-14 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <Bot className="h-7 w-7" />
                   </span>
                   <p className="mt-4 font-semibold text-foreground">Test your assistant</p>
@@ -94,13 +94,13 @@ export function ChatbotClient() {
                 <div key={i} className={`flex gap-2.5 ${m.role === "user" ? "flex-row-reverse" : ""}`}>
                   <span
                     className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
-                      m.role === "user" ? "bg-surface-2 text-foreground" : "gradient-brand text-white"
+                      m.role === "user" ? "bg-surface-2 text-foreground" : "bg-primary text-primary-foreground"
                     }`}
                   >
                     {m.role === "user" ? <UserIcon className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
                   </span>
                   <div
-                    className={`max-w-[80%] whitespace-pre-wrap rounded-2xl px-4 py-2.5 text-sm ${
+                    className={`max-w-[80%] whitespace-pre-wrap rounded-lg px-4 py-2.5 text-sm ${
                       m.role === "user"
                         ? "bg-primary text-white"
                         : "bg-surface-2 text-foreground"
@@ -112,10 +112,10 @@ export function ChatbotClient() {
               ))}
               {loading && (
                 <div className="flex gap-2.5">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full gradient-brand text-white">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
                     <Bot className="h-4 w-4" />
                   </span>
-                  <div className="rounded-2xl bg-surface-2 px-4 py-3">
+                  <div className="rounded-lg bg-surface-2 px-4 py-3">
                     <span className="flex gap-1">
                       <span className="h-2 w-2 animate-bounce rounded-full bg-muted [animation-delay:-0.3s]" />
                       <span className="h-2 w-2 animate-bounce rounded-full bg-muted [animation-delay:-0.15s]" />
@@ -134,7 +134,7 @@ export function ChatbotClient() {
                 onChange={(e) => setDraft(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && send()}
                 placeholder="Type a customer message…"
-                className="flex-1 rounded-full border border-border bg-surface-2 px-4 py-2.5 text-sm text-foreground placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/40"
+                className="flex-1 rounded-md border border-border bg-surface-2 px-4 py-2.5 text-sm text-foreground placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-ring/40"
               />
               <Button size="icon" onClick={send} loading={loading} aria-label="Send">
                 {!loading && <Send className="h-4 w-4" />}

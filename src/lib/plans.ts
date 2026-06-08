@@ -10,7 +10,8 @@ export type ToolKey =
   | "media"
   | "ecommerce"
   | "ads"
-  | "analytics";
+  | "analytics"
+  | "autopromote";
 
 export interface PlanDefinition {
   id: Tier;
@@ -29,6 +30,11 @@ export interface PlanDefinition {
   campaignLimit: number | null;
   /** Monthly AI generation cap across tools; null = unlimited */
   aiGenerationLimit: number | null;
+  /**
+   * Max Auto-Promote promotion profiles a user on this tier may create.
+   * 0 = feature locked, null = unlimited (fair-use).
+   */
+  promotionProfileLimit: number | null;
   perks: string[];
 }
 
@@ -53,6 +59,7 @@ export const PLANS: Record<Tier, PlanDefinition> = {
     tools: ["campaigns", "content", "seo", "social", "email", "analytics"],
     campaignLimit: 5,
     aiGenerationLimit: 100,
+    promotionProfileLimit: 0,
     perks: ["Email support"],
   },
   pro: {
@@ -75,6 +82,7 @@ export const PLANS: Record<Tier, PlanDefinition> = {
     tools: ["campaigns", "content", "seo", "social", "email", "chatbot", "analytics"],
     campaignLimit: null,
     aiGenerationLimit: 1000,
+    promotionProfileLimit: 0,
     perks: ["Priority email support"],
   },
   business: {
@@ -90,6 +98,7 @@ export const PLANS: Record<Tier, PlanDefinition> = {
       "Advanced AI Chatbot (analytics + reporting)",
       "E-commerce optimization tools",
       "Ad Manager (AI-optimized campaigns)",
+      "Auto-Promote (up to 3 brands, autonomous posting)",
       "Priority support",
     ],
     tools: [
@@ -103,9 +112,11 @@ export const PLANS: Record<Tier, PlanDefinition> = {
       "ecommerce",
       "ads",
       "analytics",
+      "autopromote",
     ],
     campaignLimit: null,
     aiGenerationLimit: 5000,
+    promotionProfileLimit: 3,
     perks: ["Priority support"],
   },
   enterprise: {
@@ -121,6 +132,7 @@ export const PLANS: Record<Tier, PlanDefinition> = {
       "Multi-user / team accounts",
       "Advanced analytics + reporting",
       "Custom integrations (API access)",
+      "Auto-Promote (unlimited brands, autonomous posting)",
       "Dedicated account manager",
     ],
     tools: [
@@ -134,9 +146,11 @@ export const PLANS: Record<Tier, PlanDefinition> = {
       "ecommerce",
       "ads",
       "analytics",
+      "autopromote",
     ],
     campaignLimit: null,
     aiGenerationLimit: null,
+    promotionProfileLimit: null,
     perks: ["Dedicated account manager", "API access", "White-label"],
   },
 };
@@ -155,6 +169,11 @@ export function tierRank(tier: Tier): number {
 
 export function tierHasTool(tier: Tier, tool: ToolKey): boolean {
   return PLANS[tier].tools.includes(tool);
+}
+
+/** Max Auto-Promote profiles for a tier (0 = locked, null = unlimited). */
+export function promotionProfileLimit(tier: Tier): number | null {
+  return PLANS[tier].promotionProfileLimit;
 }
 
 /** Lowest tier that unlocks a given tool. */

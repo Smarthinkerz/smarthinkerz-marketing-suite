@@ -19,7 +19,6 @@ export default async function SocialPage() {
         title={meta.name}
         description="Generate platform-optimized captions and hashtags."
         icon={meta.icon}
-        accent={meta.accent}
       />
       <SocialClient />
     </div>

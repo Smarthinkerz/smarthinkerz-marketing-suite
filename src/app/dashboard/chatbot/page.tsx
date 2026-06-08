@@ -19,7 +19,6 @@ export default async function ChatbotPage() {
         title={meta.name}
         description="Configure a customer-service assistant and preview it live."
         icon={meta.icon}
-        accent={meta.accent}
       />
       <ChatbotClient />
     </div>

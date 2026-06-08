@@ -65,7 +65,7 @@ export default async function DashboardPage() {
           {limit && (
             <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-surface-2">
               <div
-                className="h-full rounded-full gradient-brand"
+                className="h-full rounded-full bg-primary"
                 style={{ width: `${usagePct}%` }}
               />
             </div>
@@ -101,16 +101,11 @@ export default async function DashboardPage() {
                 key={tool.key}
                 href={tool.href}
                 className={cn(
-                  "group relative flex flex-col gap-3 rounded-2xl border border-border bg-surface p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg",
+                  "group relative flex flex-col gap-3 rounded-lg border border-border bg-surface p-5 transition-all hover:-translate-y-0.5 hover:shadow-lg",
                   !unlocked && "opacity-75",
                 )}
               >
-                <span
-                  className={cn(
-                    "flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br text-white shadow-md",
-                    tool.accent,
-                  )}
-                >
+                <span className="flex h-11 w-11 items-center justify-center rounded-md bg-surface-2 text-primary">
                   <Icon name={tool.icon} className="h-5 w-5" />
                 </span>
                 <div>

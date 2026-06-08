@@ -22,7 +22,6 @@ export default async function AnalyticsPage() {
         title={meta.name}
         description="Unified performance across all your campaigns and channels."
         icon={meta.icon}
-        accent={meta.accent}
       />
       <AnalyticsClient data={data} />
     </div>

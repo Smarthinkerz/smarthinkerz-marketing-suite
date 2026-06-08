@@ -33,14 +33,14 @@ export function UserMenu({ user }: { user: SessionUser }) {
         onClick={() => setOpen((o) => !o)}
         className="flex items-center gap-2 rounded-full border border-border bg-surface py-1 pl-1 pr-2.5 transition-colors hover:bg-surface-2"
       >
-        <span className="flex h-8 w-8 items-center justify-center rounded-full gradient-brand text-xs font-bold text-white">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
           {initials}
         </span>
         <ChevronDown className="h-4 w-4 text-muted" />
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-64 rounded-2xl border border-border bg-surface p-2 shadow-xl animate-fade-in-up">
+        <div className="absolute right-0 top-full mt-2 w-64 rounded-lg border border-border bg-surface p-2 shadow-xl animate-fade-in-up">
           <div className="border-b border-border px-3 py-3">
             <p className="truncate text-sm font-semibold text-foreground">
               {user.fullName || "Account"}

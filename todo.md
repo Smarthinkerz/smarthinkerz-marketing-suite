@@ -81,3 +81,32 @@
 - [ ] Swap in shared-store rate limiter (Redis/Upstash) for multi-instance scale
 - [ ] Tighten CSP for production domains before launch
 - [ ] Replace stale .env.example (protected file) — use env.production.template
+
+## Auto-Promote — Generic Multi-Tenant Autonomous Promotion (premium feature)
+
+Gating: Business (up to 3 profiles) / Enterprise (unlimited). Per-user data, RLS-scoped. No hardcoded brand facts — each user configures their own promotion profile.
+
+### Phase 1 — Per-user autonomous content engine (no platform approvals needed)
+- [ ] Supabase schema: promotion_profiles, social_accounts, content_posts, content_runs (+ enums, RLS per-user, indexes)
+- [ ] Apply schema to live Supabase via MCP
+- [ ] Add ToolKey 'autopromote' + tier gating (business/enterprise) in plans registry
+- [ ] Register Auto-Promote tool (Rocket icon, violet->cyan accent) in tools registry
+- [ ] Per-user AI content engine grounded in each profile (platform-tailored, rotating angles)
+- [ ] Profile limit enforcement by tier (business=3, enterprise=unlimited)
+- [ ] Secured cron API route (/api/cron/promote) with CRON_SECRET (multi-tenant fan-out)
+- [ ] Vercel Cron config in vercel.json
+- [ ] Dashboard /dashboard/auto-promote: profiles, content calendar/queue, accounts, history
+- [ ] Sidebar nav item with Business+ lock badge
+- [ ] Manual "Run now" + approve/edit/delete post server actions
+
+### Phase 2 — Live auto-publishing (after Meta + LinkedIn app approvals)
+- [ ] social_accounts OAuth connect/disconnect UI (per user)
+- [ ] LinkedIn OAuth + publish
+- [ ] Meta (Facebook Page + Instagram Business) OAuth + publish
+- [ ] Cron publishes due, approved posts automatically (hands-off mode per profile)
+- [ ] Token refresh handling
+
+### Delivery
+- [ ] Production build green (NODE_ENV=production)
+- [ ] Commit + push to Smarthinkerz repo
+- [ ] Setup guide (env vars, Vercel Cron, platform app approval steps)

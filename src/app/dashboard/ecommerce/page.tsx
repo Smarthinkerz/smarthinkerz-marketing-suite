@@ -19,7 +19,6 @@ export default async function EcommercePage() {
         title={meta.name}
         description="Optimize product listings for higher conversion."
         icon={meta.icon}
-        accent={meta.accent}
       />
       <EcommerceClient />
     </div>

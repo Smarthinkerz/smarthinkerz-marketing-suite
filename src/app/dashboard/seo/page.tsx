@@ -19,7 +19,6 @@ export default async function SeoPage() {
         title={meta.name}
         description="Keyword research, content ideas, and meta tags powered by AI."
         icon={meta.icon}
-        accent={meta.accent}
       />
       <SeoClient />
     </div>

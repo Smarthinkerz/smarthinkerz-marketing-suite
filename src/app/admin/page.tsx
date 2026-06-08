@@ -62,7 +62,7 @@ export default async function AdminOverviewPage() {
                     </span>
                   </div>
                   <div className="h-2.5 w-full overflow-hidden rounded-full bg-surface-2">
-                    <div className="h-full rounded-full gradient-brand" style={{ width: `${pct}%` }} />
+                    <div className="h-full rounded-full bg-primary" style={{ width: `${pct}%` }} />
                   </div>
                 </div>
               );
@@ -73,19 +73,19 @@ export default async function AdminOverviewPage() {
         <Card>
           <CardHeader title="Quick actions" />
           <div className="space-y-2">
-            <Link href="/admin/cms" className="flex items-center justify-between rounded-xl border border-border p-3 hover:bg-surface-2">
+            <Link href="/admin/cms" className="flex items-center justify-between rounded-md border border-border p-3 hover:bg-surface-2">
               <span className="flex items-center gap-2 text-sm font-medium text-foreground">
                 <FileEdit className="h-4 w-4 text-primary" /> Edit front page
               </span>
               <ArrowRight className="h-4 w-4 text-muted" />
             </Link>
-            <Link href="/admin/analytics" className="flex items-center justify-between rounded-xl border border-border p-3 hover:bg-surface-2">
+            <Link href="/admin/analytics" className="flex items-center justify-between rounded-md border border-border p-3 hover:bg-surface-2">
               <span className="flex items-center gap-2 text-sm font-medium text-foreground">
                 <BarChart3 className="h-4 w-4 text-accent" /> View analytics
               </span>
               <ArrowRight className="h-4 w-4 text-muted" />
             </Link>
-            <Link href="/admin/users" className="flex items-center justify-between rounded-xl border border-border p-3 hover:bg-surface-2">
+            <Link href="/admin/users" className="flex items-center justify-between rounded-md border border-border p-3 hover:bg-surface-2">
               <span className="flex items-center gap-2 text-sm font-medium text-foreground">
                 <Users className="h-4 w-4 text-success" /> Manage users
               </span>

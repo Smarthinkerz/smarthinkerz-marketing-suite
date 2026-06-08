@@ -19,7 +19,6 @@ export default async function ContentPage() {
         title={meta.name}
         description="Generate blog posts, ad copy, and product descriptions in seconds."
         icon={meta.icon}
-        accent={meta.accent}
       />
       <ContentClient />
     </div>

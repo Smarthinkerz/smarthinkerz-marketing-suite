@@ -8,7 +8,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   return (
     <div className="grid min-h-screen lg:grid-cols-2">
       {/* Brand panel */}
-      <div className="relative hidden flex-col justify-between overflow-hidden gradient-brand p-12 lg:flex">
+      <div className="relative hidden flex-col justify-between overflow-hidden bg-primary p-12 lg:flex">
         <Logo href="/" showText className="[&_span]:text-white" />
         <div className="relative z-10 text-white">
           <h2 className="text-3xl font-extrabold leading-tight">

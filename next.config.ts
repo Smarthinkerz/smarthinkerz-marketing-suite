@@ -12,11 +12,13 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ["*.manus.computer"],
   images: {
     remotePatterns: [
+      // Supabase Storage (your own project bucket)
       { protocol: "https", hostname: "**.supabase.co" },
+      // OpenAI DALL-E generated images
       { protocol: "https", hostname: "oaidalleapiprodscus.blob.core.windows.net" },
+      // Unsplash (CMS / marketing images)
       { protocol: "https", hostname: "images.unsplash.com" },
     ],
   },

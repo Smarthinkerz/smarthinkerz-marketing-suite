@@ -7,7 +7,7 @@
   --surface: #f7f7fb;
   --surface-2: #efeff6;
   --foreground: #0f1222;
-  --muted: #6b7280;
+  --muted: #4b5563;
   --border: #e6e6ef;
   --primary: #6d28d9;
   --primary-foreground: #ffffff;
@@ -24,7 +24,7 @@
   --surface: #151b2e;
   --surface-2: #1e2740;
   --foreground: #f4f5fb;
-  --muted: #9aa3b2;
+  --muted: #8b95a8;
   --border: #283353;
   --primary: #8b5cf6;
   --primary-foreground: #0b1020;
@@ -53,7 +53,7 @@
   --color-ring: var(--ring);
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --radius-card: 20px;
+  --radius-card: 8px;
 }
 
 * {
@@ -76,6 +76,11 @@ body {
   background: color-mix(in srgb, var(--primary) 30%, transparent);
 }
 
+/* -------------------------------------------------------
+   gradient-brand / text-gradient-brand
+   RESERVED FOR LOGO MARK ONLY — do not use elsewhere.
+   Use bg-primary / text-primary for all other UI elements.
+------------------------------------------------------- */
 @utility gradient-brand {
   background-image: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
 }

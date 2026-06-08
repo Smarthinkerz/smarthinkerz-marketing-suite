@@ -48,8 +48,8 @@ export function Hero({ hero }: { hero: CmsContent["hero"] }) {
         </div>
 
         <div className="mx-auto mt-16 max-w-5xl">
-          <div className="rounded-3xl border border-border bg-surface p-2 shadow-2xl">
-            <div className="rounded-2xl gradient-brand p-8 sm:p-12">
+          <div className="rounded-xl border border-border bg-surface p-2 shadow-2xl">
+            <div className="rounded-lg bg-primary p-8 sm:p-12">
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 {[
                   { k: "Tools", v: "10" },
@@ -87,9 +87,9 @@ export function Features({ features }: { features: CmsContent["features"] }) {
           {features.items.map((item) => (
             <div
               key={item.title}
-              className="group rounded-2xl border border-border bg-surface p-6 transition-all hover:-translate-y-1 hover:shadow-lg"
+              className="group rounded-lg border border-border bg-surface p-6 transition-all hover:-translate-y-1 hover:shadow-lg"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl gradient-brand text-white">
+              <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary/10 text-primary">
                 <Icon name={item.icon} className="h-6 w-6" />
               </div>
               <h3 className="mt-4 text-lg font-semibold text-foreground">{item.title}</h3>
@@ -138,7 +138,7 @@ export function Testimonials({ testimonials }: { testimonials: CmsContent["testi
         </div>
         <div className="mt-14 grid gap-6 md:grid-cols-3">
           {testimonials.items.map((t, i) => (
-            <figure key={i} className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
+            <figure key={i} className="rounded-lg border border-border bg-surface p-6 shadow-sm">
               <div className="flex gap-1 text-warning">
                 {Array.from({ length: 5 }).map((_, idx) => (
                   <Star key={idx} className="h-4 w-4 fill-current" />
@@ -161,7 +161,7 @@ export function FinalCta({ finalCta }: { finalCta: CmsContent["finalCta"] }) {
   return (
     <section className="bg-surface py-20">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <div className="relative overflow-hidden rounded-3xl gradient-brand px-8 py-14 text-center shadow-2xl sm:px-16">
+        <div className="relative overflow-hidden rounded-xl bg-primary px-8 py-14 text-center shadow-2xl sm:px-16">
           <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
             {finalCta.headline}
           </h2>

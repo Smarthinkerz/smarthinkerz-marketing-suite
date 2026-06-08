@@ -113,7 +113,7 @@ export function CmsEditor({
 
       {msg && (
         <div
-          className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm ${
+          className={`flex items-center gap-2 rounded-md px-4 py-2.5 text-sm ${
             msg.tone === "ok" ? "bg-success/10 text-success" : "bg-error/10 text-error"
           }`}
         >
@@ -123,7 +123,7 @@ export function CmsEditor({
       )}
 
       {setupMode && (
-        <div className="rounded-xl bg-warning/10 px-4 py-2.5 text-sm text-warning">
+        <div className="rounded-md bg-warning/10 px-4 py-2.5 text-sm text-warning">
           Demo mode: edits are not persisted. Connect Supabase to publish to the live site and keep version history.
         </div>
       )}
@@ -136,8 +136,8 @@ export function CmsEditor({
               <button
                 key={s.key}
                 onClick={() => setActive(s.key)}
-                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-                  active === s.key ? "gradient-brand text-white" : "bg-surface-2 text-muted hover:text-foreground"
+                className={`rounded px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  active === s.key ? "bg-primary text-primary-foreground" : "bg-surface-2 text-muted hover:text-foreground"
                 }`}
               >
                 {s.label}

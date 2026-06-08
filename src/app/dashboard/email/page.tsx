@@ -19,7 +19,6 @@ export default async function EmailPage() {
         title={meta.name}
         description="Subject lines, preheaders, and email copy that convert."
         icon={meta.icon}
-        accent={meta.accent}
       />
       <EmailClient />
     </div>

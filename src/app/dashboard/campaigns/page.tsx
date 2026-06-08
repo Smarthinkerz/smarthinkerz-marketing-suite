@@ -23,7 +23,6 @@ export default async function CampaignsPage() {
         title={meta.name}
         description="Plan, launch, and track multi-channel campaigns."
         icon={meta.icon}
-        accent={meta.accent}
       />
       <CampaignsClient initial={campaigns} campaignLimit={limit} setupMode={isSetupMode()} />
     </div>

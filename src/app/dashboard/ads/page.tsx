@@ -19,7 +19,6 @@ export default async function AdsPage() {
         title={meta.name}
         description="AI-optimized ad creative, targeting, and budget plans."
         icon={meta.icon}
-        accent={meta.accent}
       />
       <AdsClient />
     </div>
