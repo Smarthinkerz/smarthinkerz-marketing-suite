@@ -15,7 +15,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
 import { createClient } from "@supabase/supabase-js";
 import { config } from "@/lib/config";
-import { PLANS, tierFromSlug } from "@/lib/plans";
+import { resolveTrack, tierFromTrackSlug } from "@/lib/plans";
 import type { Tier } from "@/lib/plans";
 
 export const runtime = "nodejs";
@@ -33,11 +33,14 @@ interface TapChargeEvent {
   description?: string;
   metadata?: {
     userId?: string;
-    planKey?: string;
+    /** SmarThinkerz Academy scheme: canonical track slug e.g. "6-month-professional" */
+    trackSlug?: string;
     installmentCount?: string;
+    platform?: string;
+    /** Legacy fields — kept for backward compat */
+    planKey?: string;
     tier?: string;
     cycle?: string;
-    platform?: string;
   };
   reference?: {
     gateway?: string;
@@ -132,26 +135,32 @@ async function handleCaptured(charge: TapChargeEvent): Promise<string> {
     return "error:no-user-id";
   }
 
-  // Resolve plan details
-  const planKey = pending?.plan_key ?? meta.planKey ?? "";
-  const tierRaw = pending?.tier ?? meta.tier ?? "";
-  const cycle = pending?.cycle ?? meta.cycle ?? "monthly";
+  // Resolve plan details — prefer SmarThinkerz Academy trackSlug scheme
+  const trackSlug = meta.trackSlug ?? pending?.plan_key ?? meta.planKey ?? "";
   const installmentCount = pending?.installment_count ?? parseInt(meta.installmentCount ?? "1", 10);
   const installmentAmount = pending?.installment_amount ?? (charge.amount / 100 / installmentCount);
   const totalAmountAed = pending?.total_amount_aed ?? (charge.amount / 100);
 
-  // Resolve internal tier
-  const tier: Tier = (tierRaw as Tier) ?? tierFromSlug(planKey) ?? "basic";
+  // Resolve internal tier from track slug (SmarThinkerz Academy scheme)
+  const resolvedTierFromTrack = tierFromTrackSlug(trackSlug);
+  const legacyTierRaw = pending?.tier ?? meta.tier ?? "";
+  const tier: Tier = resolvedTierFromTrack ?? (legacyTierRaw as Tier) ?? "basic";
 
-  // 2. Calculate period end
+  // Resolve track for duration-based period end
+  const track = resolveTrack(trackSlug);
+  const durationMonths = track?.durationMonths ?? 1;
+
+  // 2. Calculate period end per spec:
+  //    - Full payment: currentPeriodEnd = now + durationMonths (365 days for 12-month, etc.)
+  //    - Installment:  currentPeriodEnd = now + 30 days per payment
   const now = new Date();
   const periodEnd = new Date(now);
   if (installmentCount > 1) {
-    // Installment: each payment extends by 30 days
+    // Installment: each captured payment extends access by 30 days
     periodEnd.setDate(periodEnd.getDate() + 30);
   } else {
-    // Pay in full: yearly = 365 days, monthly = 30 days
-    periodEnd.setDate(periodEnd.getDate() + (cycle === "yearly" ? 365 : 30));
+    // Pay in full: extend by the full track duration
+    periodEnd.setDate(periodEnd.getDate() + durationMonths * 30);
   }
 
   // 3. Upsert subscription — activate or increment installments_paid
@@ -166,12 +175,15 @@ async function handleCaptured(charge: TapChargeEvent): Promise<string> {
   const tokenBudgetIncrement = totalAmountAed * 0.1;
   const newTokenBudget = (existingSub?.ai_token_budget ?? 0) + tokenBudgetIncrement;
 
+  // Derive cycle label from track duration
+  const cycleLabel = track ? `${track.durationMonths}-month` : (pending?.cycle ?? "monthly");
+
   await supabase.from("subscriptions").upsert({
     user_id: userId,
     tier,
     status: "active",
-    cycle,
-    plan_key: planKey,
+    cycle: cycleLabel,
+    plan_key: trackSlug,
     tap_pay_ref: charge.id,
     installment_count: installmentCount,
     installments_paid: newInstallmentsPaid,
@@ -208,17 +220,18 @@ async function handleCaptured(charge: TapChargeEvent): Promise<string> {
   await supabase.from("analytics_events").insert({
     user_id: userId,
     type: "payment",
-    meta: {
-      tier,
-      cycle,
-      planKey,
-      chargeId: charge.id,
-      amountAed: charge.amount / 100,
-      installmentNumber: newInstallmentsPaid,
-    },
+      meta: {
+        tier,
+        cycle: cycleLabel,
+        trackSlug,
+        platform: meta.platform ?? "smarthinkerz-academy",
+        chargeId: charge.id,
+        amountAed: charge.amount / 100,
+        installmentNumber: newInstallmentsPaid,
+      },
   });
 
-  console.log(`[tap-webhook] CAPTURED: user=${userId} tier=${tier} charge=${charge.id}`);
+  console.log(`[tap-webhook] CAPTURED: user=${userId} tier=${tier} track=${trackSlug} charge=${charge.id}`);
   return `activated:${tier}:installment=${newInstallmentsPaid}`;
 }
 

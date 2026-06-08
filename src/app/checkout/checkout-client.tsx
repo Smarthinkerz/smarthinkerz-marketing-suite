@@ -2,69 +2,56 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Check, CreditCard, Loader2, ShieldCheck, AlertCircle } from "lucide-react";
+import { Check, CreditCard, Loader2, ShieldCheck, AlertCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PLAN_LIST, PLANS, tierRank, type Tier } from "@/lib/plans";
+import { TRACK_LIST, resolveTrack, type TrackDefinition } from "@/lib/plans";
 import { createCheckoutSession, INSTALLMENT_OPTIONS } from "./actions";
 import type { SessionUser } from "@/lib/types";
 
-// AED conversion (1 USD ≈ 3.67 AED)
-const USD_TO_AED = 3.67;
-function toAed(usd: number): number {
-  return Math.round(usd * USD_TO_AED * 100) / 100;
-}
 function fmtAed(amount: number): string {
   return new Intl.NumberFormat("en-AE", {
     style: "currency",
     currency: "AED",
-    minimumFractionDigits: 2,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(amount);
 }
 
 interface CheckoutClientProps {
   user: SessionUser;
-  initialPlan?: string;
-  initialTier?: string;
-  initialCycle?: "monthly" | "yearly";
+  /** ?track=<slug|alias> or ?plan=<slug|alias> */
+  initialTrack?: string;
   tapConfigured: boolean;
 }
 
 export function CheckoutClient({
   user,
-  initialTier,
-  initialCycle = "monthly",
+  initialTrack,
   tapConfigured,
 }: CheckoutClientProps) {
-  const router = useRouter();
+  useRouter();
   const [isPending, startTransition] = useTransition();
 
-  // Resolve initial tier from URL param or default to pro
-  const resolvedInitialTier: Tier =
-    (["basic", "pro", "business", "enterprise"].includes(initialTier ?? "")
-      ? (initialTier as Tier)
-      : "pro");
+  // Resolve initial track from URL param or default to accelerator (highlighted)
+  const defaultTrack: TrackDefinition =
+    (initialTrack ? resolveTrack(initialTrack) : null) ??
+    TRACK_LIST.find((t) => t.highlighted) ??
+    TRACK_LIST[1];
 
-  const [selectedTier, setSelectedTier] = useState<Tier>(resolvedInitialTier);
-  const [cycle, setCycle] = useState<"monthly" | "yearly">(initialCycle);
+  const [selectedTrack, setSelectedTrack] = useState<TrackDefinition>(defaultTrack);
   const [installmentCount, setInstallmentCount] = useState(1);
   const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const plan = PLANS[selectedTier];
-  const priceUsd = cycle === "yearly" ? plan.priceYearly : plan.priceMonthly;
-  const totalAed = toAed(priceUsd);
+  const totalAed = selectedTrack.totalAed;
   const installmentAed = Math.round((totalAed / installmentCount) * 100) / 100;
-
-  const planKey = `${plan.slug}-${cycle}`;
 
   function handleProceed() {
     setError(null);
     startTransition(async () => {
       const result = await createCheckoutSession({
-        planKey,
-        tier: selectedTier,
-        cycle,
+        trackSlug: selectedTrack.slug,
         installmentCount,
         phone: phone.trim() || undefined,
       });
@@ -85,7 +72,7 @@ export function CheckoutClient({
       <div className="border-b border-border bg-surface px-4 py-4">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <div>
-            <p className="text-sm font-semibold text-foreground">SmarThinkerz Marketing Suite</p>
+            <p className="text-sm font-semibold text-foreground">Smarthinkerz Academy</p>
             <p className="text-xs text-muted">Secure checkout powered by Tap Payments</p>
           </div>
           <div className="flex items-center gap-1.5 text-xs text-muted">
@@ -97,22 +84,24 @@ export function CheckoutClient({
 
       <div className="mx-auto max-w-5xl px-4 py-10">
         <div className="grid gap-8 lg:grid-cols-3">
-          {/* Left: Plan + Options */}
+          {/* Left: Track + Options */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Step 1: Select Plan */}
+
+            {/* Step 1: Select Track */}
             <section>
               <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
-                1. Select Plan
+                1. Select Program
               </h2>
               <div className="grid gap-3 sm:grid-cols-2">
-                {PLAN_LIST.map((p) => {
-                  const isSelected = p.id === selectedTier;
-                  const isCurrent = p.id === user.tier;
-                  const priceAed = toAed(cycle === "yearly" ? p.priceYearly : p.priceMonthly);
+                {TRACK_LIST.map((t) => {
+                  const isSelected = t.slug === selectedTrack.slug;
                   return (
                     <button
-                      key={p.id}
-                      onClick={() => setSelectedTier(p.id as Tier)}
+                      key={t.slug}
+                      onClick={() => {
+                        setSelectedTrack(t);
+                        setInstallmentCount(1); // reset installments on track change
+                      }}
                       style={{
                         outline: isSelected ? "2px solid var(--color-primary)" : "none",
                       }}
@@ -122,28 +111,26 @@ export function CheckoutClient({
                           : "border-border bg-surface hover:border-primary/40"
                       }`}
                     >
-                      {p.highlighted && (
+                      {t.highlighted && (
                         <Badge variant="primary" className="absolute -top-2 right-3 text-[10px]">
                           Popular
                         </Badge>
                       )}
-                      {isCurrent && (
-                        <Badge variant="default" className="absolute -top-2 left-3 text-[10px]">
-                          Current
-                        </Badge>
-                      )}
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <p className="font-semibold text-foreground">{p.name}</p>
-                          <p className="mt-0.5 text-xs text-muted">{p.tagline}</p>
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-semibold text-foreground">{t.name}</p>
+                          <p className="mt-0.5 text-xs text-muted">{t.description}</p>
                         </div>
-                        <div className="text-right">
-                          <p className="text-lg font-bold text-foreground">{fmtAed(priceAed)}</p>
-                          <p className="text-xs text-muted">/{cycle === "yearly" ? "yr" : "mo"}</p>
+                        <div className="shrink-0 text-right">
+                          <p className="text-lg font-bold text-foreground">{fmtAed(t.totalAed)}</p>
+                          <p className="flex items-center justify-end gap-0.5 text-xs text-muted">
+                            <Clock className="h-3 w-3" />
+                            {t.durationMonths} months
+                          </p>
                         </div>
                       </div>
                       <ul className="mt-3 space-y-1">
-                        {p.features.slice(0, 3).map((f) => (
+                        {t.features.slice(0, 3).map((f) => (
                           <li key={f} className="flex items-start gap-1.5 text-xs text-muted">
                             <Check className="mt-0.5 h-3 w-3 shrink-0 text-success" />
                             {f}
@@ -163,35 +150,10 @@ export function CheckoutClient({
               </div>
             </section>
 
-            {/* Step 2: Billing Cycle */}
+            {/* Step 2: Payment Option */}
             <section>
               <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
-                2. Billing Cycle
-              </h2>
-              <div className="flex gap-3">
-                {(["monthly", "yearly"] as const).map((c) => (
-                  <button
-                    key={c}
-                    onClick={() => setCycle(c)}
-                    className={`flex-1 rounded-md border px-4 py-3 text-sm font-medium transition-colors ${
-                      cycle === c
-                        ? "border-primary bg-primary/5 text-primary"
-                        : "border-border text-muted hover:border-primary/40"
-                    }`}
-                  >
-                    {c === "monthly" ? "Monthly" : "Yearly"}
-                    {c === "yearly" && (
-                      <span className="ml-1.5 text-xs text-success font-normal">Save ~17%</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            {/* Step 3: Payment Option */}
-            <section>
-              <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
-                3. Payment Option
+                2. Payment Option
               </h2>
               <div className="grid gap-2 sm:grid-cols-2">
                 {Object.entries(INSTALLMENT_OPTIONS).map(([count, label]) => {
@@ -220,10 +182,11 @@ export function CheckoutClient({
               </div>
             </section>
 
-            {/* Step 4: Phone (optional) */}
+            {/* Step 3: Phone (optional) */}
             <section>
               <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
-                4. Phone Number <span className="normal-case font-normal text-muted">(optional)</span>
+                3. Phone Number{" "}
+                <span className="normal-case font-normal text-muted">(optional)</span>
               </h2>
               <input
                 type="tel"
@@ -247,16 +210,22 @@ export function CheckoutClient({
 
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-muted">Plan</span>
-                  <span className="font-medium text-foreground">{plan.name}</span>
+                  <span className="text-muted">Program</span>
+                  <span className="font-medium text-foreground">{selectedTrack.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted">Billing</span>
-                  <span className="font-medium text-foreground capitalize">{cycle}</span>
+                  <span className="text-muted">Duration</span>
+                  <span className="font-medium text-foreground">
+                    {selectedTrack.durationMonths} months
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted">Currency</span>
                   <span className="font-medium text-foreground">AED</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted">Platform</span>
+                  <span className="font-medium text-foreground">Smarthinkerz Academy</span>
                 </div>
 
                 <div className="border-t border-border pt-3">
@@ -267,25 +236,32 @@ export function CheckoutClient({
                   {installmentCount > 1 && (
                     <div className="mt-1 flex justify-between text-xs">
                       <span className="text-muted">Per installment</span>
-                      <span className="text-foreground">{fmtAed(installmentAed)}</span>
+                      <span className="font-medium text-foreground">{fmtAed(installmentAed)}</span>
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* Features */}
+              {/* Included features */}
               <div className="mt-4 border-t border-border pt-4">
-                <p className="mb-2 text-xs font-medium text-muted uppercase tracking-wide">
+                <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted">
                   Included
                 </p>
                 <ul className="space-y-1.5">
-                  {plan.features.slice(0, 5).map((f) => (
+                  {selectedTrack.features.map((f) => (
                     <li key={f} className="flex items-start gap-1.5 text-xs text-muted">
                       <Check className="mt-0.5 h-3 w-3 shrink-0 text-success" />
                       {f}
                     </li>
                   ))}
                 </ul>
+              </div>
+
+              {/* AI token budget note */}
+              <div className="mt-4 rounded-md bg-surface-2 px-3 py-2.5 text-xs text-muted">
+                <span className="font-medium text-foreground">Sophia AI budget:</span>{" "}
+                {fmtAed(Math.round(totalAed * 0.1))} of your payment is allocated to Sophia AI
+                usage credits.
               </div>
 
               {/* Error */}
@@ -299,7 +275,8 @@ export function CheckoutClient({
               {/* Not configured warning */}
               {!tapConfigured && (
                 <div className="mt-4 rounded-md bg-warning/10 px-3 py-2.5 text-xs text-warning">
-                  Payment processing is not configured. Set TAP_SECRET_KEY to enable live checkout.
+                  Payment processing is not configured. Set{" "}
+                  <code className="font-mono">TAP_SECRET_KEY</code> to enable live checkout.
                 </div>
               )}
 

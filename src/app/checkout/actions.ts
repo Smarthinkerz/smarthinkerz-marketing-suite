@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth";
 import { createTapCharge, parseTapPhone } from "@/lib/tap-payments";
 import { config } from "@/lib/config";
-import { PLANS, type Tier } from "@/lib/plans";
+import { resolveTrack, TRACK_LIST } from "@/lib/plans";
 
 export type CheckoutResult =
   | {
@@ -21,30 +21,17 @@ export type CheckoutResult =
     };
 
 export interface CreateCheckoutInput {
-  planKey: string;       // e.g. "smarthinkerz-pro-monthly"
-  tier: Tier;
-  cycle: "monthly" | "yearly";
+  /**
+   * Track slug (canonical or alias).
+   * Canonical: "2-month-sprint" | "3-month-accelerator" | "6-month-professional" | "12-month-master"
+   * Alias:     "foundations"    | "accelerator"          | "professional"          | "master"
+   */
+  trackSlug: string;
   installmentCount: number; // 1 = pay in full
   phone?: string;           // optional, for Tap customer object
 }
 
-// ---------------------------------------------------------------------------
-// Plan pricing in AED
-// ---------------------------------------------------------------------------
-// Exchange rate: 1 USD ≈ 3.67 AED (fixed peg)
-const USD_TO_AED = 3.67;
-
-function toAed(usd: number): number {
-  return Math.round(usd * USD_TO_AED * 100) / 100;
-}
-
-function getPlanPriceAed(tier: Tier, cycle: "monthly" | "yearly"): number {
-  const plan = PLANS[tier];
-  const usd = cycle === "yearly" ? plan.priceYearly : plan.priceMonthly;
-  return toAed(usd);
-}
-
-// Installment options per tier (count → label)
+// Installment options (count → label)
 export const INSTALLMENT_OPTIONS: Record<number, string> = {
   1: "Pay in full",
   2: "2 installments",
@@ -66,14 +53,16 @@ export async function createCheckoutSession(
     return { ok: false, error: "Payment processing is not configured. Please contact support." };
   }
 
-  const { tier, cycle, installmentCount, phone, planKey } = input;
-  const plan = PLANS[tier];
-  if (!plan) {
-    return { ok: false, error: "Invalid plan selected." };
+  const { trackSlug, installmentCount, phone } = input;
+
+  // Resolve track by canonical slug or alias
+  const track = resolveTrack(trackSlug);
+  if (!track) {
+    return { ok: false, error: "Invalid track selected." };
   }
 
-  // Calculate amounts
-  const totalAed = getPlanPriceAed(tier, cycle);
+  // Amounts in AED (from spec)
+  const totalAed = track.totalAed;
   const installmentAmount = Math.round((totalAed / installmentCount) * 100) / 100;
 
   // Parse customer name
@@ -85,27 +74,27 @@ export async function createCheckoutSession(
   // Parse phone if provided
   const parsedPhone = phone ? parseTapPhone(phone) : undefined;
 
-  // Build redirect URL
+  // Build redirect URL (per spec: https://smarthinkerzacademy.com/payment/success)
   const appUrl = config.appUrl;
   const redirectUrl = `${appUrl}/payment/success`;
 
-  // Create Tap charge
+  // Create Tap charge per spec
   const result = await createTapCharge({
     amountAed: totalAed,
-    description: `SmarThinkerz Marketing Suite — ${plan.name} (${cycle})`,
+    // Description format per spec: "Smarthinkerz Academy - <Plan Name>"
+    description: `Smarthinkerz Academy - ${track.name}`,
     customer: {
       first_name: firstName,
       last_name: lastName,
       email: user.email,
       phone: parsedPhone,
     },
+    // Metadata per spec: userId, trackSlug, installmentCount, platform
     metadata: {
       userId: user.id,
-      planKey,
+      trackSlug: track.slug,
       installmentCount: String(installmentCount),
-      tier,
-      cycle,
-      platform: "smarthinkerz-marketing-suite",
+      platform: "smarthinkerz-academy",
     },
     redirectUrl,
   });
@@ -120,9 +109,9 @@ export async function createCheckoutSession(
   await supabase.from("tap_pending_charges").insert({
     tap_charge_id: charge.id,
     user_id: user.id,
-    plan_key: planKey,
-    tier,
-    cycle,
+    plan_key: track.slug,       // stored as plan_key in DB (track slug)
+    tier: track.tier,
+    cycle: `${track.durationMonths}-month`, // e.g. "6-month"
     total_amount_aed: totalAed,
     installment_count: installmentCount,
     installment_amount: installmentAmount,
@@ -138,3 +127,6 @@ export async function createCheckoutSession(
     installmentAmount,
   };
 }
+
+// Re-export track list for the client component
+export { TRACK_LIST };

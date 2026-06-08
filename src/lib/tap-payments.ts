@@ -4,6 +4,13 @@
  * Tap API reference: https://developers.tap.company/reference
  * All amounts are in the smallest currency unit (fils for AED: 1 AED = 100 fils).
  *
+ * SmarThinkerz scheme:
+ *   platform: "smarthinkerz-academy"
+ *   metadata: { userId, trackSlug, installmentCount, platform }
+ *   description: "Smarthinkerz Academy - <Track Name>"
+ *   redirect: { url: "https://smarthinkerzacademy.com/payment/success" }
+ *   source: { id: "src_all" }  — Tap hosted page, all payment methods
+ *
  * NEVER import this file in Client Components.
  */
 
@@ -23,18 +30,28 @@ export interface TapCustomer {
   };
 }
 
+/**
+ * Input to createTapCharge.
+ * Metadata follows the SmarThinkerz Academy scheme exactly.
+ */
 export interface TapChargeInput {
-  /** Amount in AED (decimal, e.g. 79.00). Converted to fils internally. */
+  /** Amount in AED (decimal, e.g. 7999.00). Converted to fils internally. */
   amountAed: number;
+  /** "Smarthinkerz Academy - <Track Name>" */
   description: string;
   customer: TapCustomer;
+  /**
+   * Metadata per SmarThinkerz spec:
+   *   userId        — Supabase user UUID
+   *   trackSlug     — canonical track slug, e.g. "6-month-professional"
+   *   installmentCount — "1" | "2" | "3" | "4"
+   *   platform      — always "smarthinkerz-academy"
+   */
   metadata: {
     userId: string;
-    planKey: string;
+    trackSlug: string;
     installmentCount: string;
-    tier: string;
-    cycle: string;
-    platform: string;
+    platform: "smarthinkerz-academy";
   };
   /** Absolute URL to redirect to on success */
   redirectUrl: string;
@@ -64,14 +81,13 @@ export interface TapError {
 // ---------------------------------------------------------------------------
 
 /**
- * Parses a full phone number like "+971 501234567" or "+96896737452"
- * into the Tap-required { country_code, number } format.
+ * Parses a full phone number into Tap's required { country_code, number } format.
  *
- * Handles:
- *  - "+971 501234567"   → { countryCode: "+971", number: "501234567" }
- *  - "+96896737452"     → { countryCode: "+968", number: "96737452" }
- *  - "00971501234567"   → { countryCode: "+971", number: "501234567" }
- *  - "501234567"        → { countryCode: "+971", number: "501234567" } (defaults to UAE)
+ * Examples:
+ *  "+971 501234567"  → { country_code: "+971", number: "501234567" }
+ *  "+96896737452"    → { country_code: "+968", number: "96737452" }
+ *  "00971501234567"  → { country_code: "+971", number: "501234567" }
+ *  "501234567"       → { country_code: "+971", number: "501234567" } (defaults to UAE)
  */
 export function parseTapPhone(raw: string): { country_code: string; number: string } {
   const cleaned = raw.trim().replace(/\s+/g, "");
@@ -90,10 +106,10 @@ export function parseTapPhone(raw: string): { country_code: string; number: stri
   const knownCodes: Record<string, number> = {
     // 3-digit codes (common MENA)
     "966": 3, "971": 3, "968": 3, "974": 3, "973": 3, "965": 3, "967": 3, "962": 3,
-    "963": 3, "964": 3, "961": 3, "970": 3, "972": 3, "20": 2, "212": 3, "213": 3,
+    "963": 3, "964": 3, "961": 3, "970": 3, "972": 3, "212": 3, "213": 3,
     "216": 3, "218": 3, "249": 3, "252": 3,
     // 2-digit codes
-    "44": 2, "49": 2, "33": 2, "39": 2, "34": 2,
+    "20": 2, "44": 2, "49": 2, "33": 2, "39": 2, "34": 2,
     // 1-digit codes
     "1": 1,
   };
@@ -134,6 +150,10 @@ function tapHeaders(): HeadersInit {
  * Creates a Tap charge and returns the charge object including the hosted
  * payment page URL. The caller should redirect the user to
  * `charge.transaction.url`.
+ *
+ * Amount is converted from AED to fils (×100) internally.
+ * source.id = "src_all" enables the Tap hosted page with all payment methods
+ * (Visa, Mastercard, AMEX, mada, KNET, etc.).
  */
 export async function createTapCharge(
   input: TapChargeInput,

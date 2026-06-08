@@ -183,3 +183,136 @@ export function minTierForTool(tool: ToolKey): Tier {
   }
   return "enterprise";
 }
+
+// ---------------------------------------------------------------------------
+// SmarThinkerz Academy — Track / Plan definitions
+// ---------------------------------------------------------------------------
+// These are the four fixed-duration tracks sold via Tap Payments.
+// URL param: ?track=<slug>  or  ?plan=<planKey>
+// Plan aliases (spec): foundations → 2-month-sprint
+//                      accelerator → 3-month-accelerator
+//                      professional → 6-month-professional
+//                      master → 12-month-master
+// ---------------------------------------------------------------------------
+
+export type TrackSlug =
+  | "2-month-sprint"
+  | "3-month-accelerator"
+  | "6-month-professional"
+  | "12-month-master";
+
+export interface TrackDefinition {
+  /** Canonical slug used in Tap metadata.trackSlug */
+  slug: TrackSlug;
+  /** Human-readable alias (URL param alias) */
+  alias: string;
+  name: string;
+  /** Total price in AED (full payment) */
+  totalAed: number;
+  /** Duration in months */
+  durationMonths: number;
+  /** Internal marketing-suite tier this track maps to */
+  tier: Tier;
+  description: string;
+  features: string[];
+  highlighted?: boolean;
+}
+
+export const TRACKS: Record<TrackSlug, TrackDefinition> = {
+  "2-month-sprint": {
+    slug: "2-month-sprint",
+    alias: "foundations",
+    name: "Foundations Sprint",
+    totalAed: 1499,
+    durationMonths: 2,
+    tier: "basic",
+    description: "2-month intensive to master marketing fundamentals.",
+    features: [
+      "2 months full access",
+      "Content Creator & SEO tools",
+      "Social media automation",
+      "Email marketing basics",
+      "Certificate of completion",
+    ],
+  },
+  "3-month-accelerator": {
+    slug: "3-month-accelerator",
+    alias: "accelerator",
+    name: "Accelerator Program",
+    totalAed: 2999,
+    durationMonths: 3,
+    tier: "pro",
+    description: "3-month accelerator for growing marketing teams.",
+    highlighted: true,
+    features: [
+      "3 months full access",
+      "All Pro tools unlocked",
+      "AI Chatbot deployment",
+      "Full analytics dashboard",
+      "Priority support",
+      "Certificate of completion",
+    ],
+  },
+  "6-month-professional": {
+    slug: "6-month-professional",
+    alias: "professional",
+    name: "Professional Track",
+    totalAed: 7999,
+    durationMonths: 6,
+    tier: "business",
+    description: "6-month professional program for agencies and power users.",
+    features: [
+      "6 months full access",
+      "All Business tools unlocked",
+      "Media Generator (images + video)",
+      "Ad Manager & Auto-Promote",
+      "E-commerce optimization",
+      "Dedicated onboarding session",
+      "Certificate of completion",
+    ],
+  },
+  "12-month-master": {
+    slug: "12-month-master",
+    alias: "master",
+    name: "Master Program",
+    totalAed: 14999,
+    durationMonths: 12,
+    tier: "enterprise",
+    description: "12-month mastery program with full Enterprise access.",
+    features: [
+      "12 months full access",
+      "Full Enterprise suite",
+      "White-label option",
+      "Multi-user team accounts",
+      "Custom API integrations",
+      "Dedicated account manager",
+      "Certificate of completion",
+    ],
+  },
+};
+
+export const TRACK_LIST: TrackDefinition[] = [
+  TRACKS["2-month-sprint"],
+  TRACKS["3-month-accelerator"],
+  TRACKS["6-month-professional"],
+  TRACKS["12-month-master"],
+];
+
+/**
+ * Resolve a track by slug or alias.
+ * Accepts both canonical slugs ("6-month-professional") and
+ * URL aliases ("professional").
+ */
+export function resolveTrack(slugOrAlias: string): TrackDefinition | null {
+  // Try canonical slug first
+  if (slugOrAlias in TRACKS) return TRACKS[slugOrAlias as TrackSlug];
+  // Try alias
+  const byAlias = TRACK_LIST.find((t) => t.alias === slugOrAlias);
+  return byAlias ?? null;
+}
+
+/** Map a track slug back to the internal marketing-suite tier. */
+export function tierFromTrackSlug(slug: string): Tier | null {
+  const track = resolveTrack(slug);
+  return track?.tier ?? null;
+}
