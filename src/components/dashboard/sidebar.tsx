@@ -16,7 +16,21 @@ interface SidebarProps {
 }
 
 const PRIMARY = [
-  { href: "/dashboard", label: "Overview", icon: "LayoutDashboard" },
+  { href: "/dashboard", label: "My Work", icon: "LayoutDashboard" },
+];
+
+const WORKFLOW = [
+  { href: "/dashboard/approvals", label: "Approvals Inbox", icon: "CheckCircle2" },
+  { href: "/dashboard/auto-promote", label: "Content Queue", icon: "Zap" },
+];
+
+const BRAND_LINKS = [
+  { href: "/dashboard/brand", label: "Brand Guardrails", icon: "Shield" },
+  { href: "/dashboard/brand/assets", label: "Asset Library", icon: "FolderOpen" },
+];
+
+const REPORTING = [
+  { href: "/dashboard/reports", label: "Reports", icon: "BarChart2" },
 ];
 
 const ACCOUNT = [
@@ -39,7 +53,7 @@ export function Sidebar({ tier, role, onNavigate }: SidebarProps) {
     );
 
   return (
-    <div className="flex h-full flex-col gap-6 overflow-y-auto p-4">
+    <div className="flex h-full flex-col gap-5 overflow-y-auto p-4">
       <div className="px-2 pt-2">
         <Logo />
       </div>
@@ -52,6 +66,20 @@ export function Sidebar({ tier, role, onNavigate }: SidebarProps) {
           </Link>
         ))}
       </nav>
+
+      <div>
+        <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-muted">
+          Workflow
+        </p>
+        <nav className="flex flex-col gap-1">
+          {WORKFLOW.map((item) => (
+            <Link key={item.href} href={item.href} onClick={onNavigate} className={linkClass(isActive(item.href))}>
+              <Icon name={item.icon} className="h-5 w-5" />
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </div>
 
       <div>
         <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-muted">
@@ -74,6 +102,34 @@ export function Sidebar({ tier, role, onNavigate }: SidebarProps) {
               </Link>
             );
           })}
+        </nav>
+      </div>
+
+      <div>
+        <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-muted">
+          Brand
+        </p>
+        <nav className="flex flex-col gap-1">
+          {BRAND_LINKS.map((item) => (
+            <Link key={item.href} href={item.href} onClick={onNavigate} className={linkClass(isActive(item.href))}>
+              <Icon name={item.icon} className="h-5 w-5" />
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      </div>
+
+      <div>
+        <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-muted">
+          Reporting
+        </p>
+        <nav className="flex flex-col gap-1">
+          {REPORTING.map((item) => (
+            <Link key={item.href} href={item.href} onClick={onNavigate} className={linkClass(isActive(item.href))}>
+              <Icon name={item.icon} className="h-5 w-5" />
+              {item.label}
+            </Link>
+          ))}
         </nav>
       </div>
 

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Logo } from "@/components/brand/logo";
-import { FooterAdminLogin } from "@/components/marketing/footer-admin-login";
 import type { CmsFooter } from "@/lib/types";
 
 export function SiteFooter({ footer }: { footer: CmsFooter }) {
@@ -26,7 +25,12 @@ export function SiteFooter({ footer }: { footer: CmsFooter }) {
         </div>
         <div className="mt-10 flex flex-col items-start justify-between gap-4 border-t border-border pt-6 text-sm text-muted sm:flex-row sm:items-center">
           <span>{footer.copyright}</span>
-          <FooterAdminLogin />
+          <Link
+            href="/auth/sign-in?redirect=/admin"
+            className="text-xs text-muted/50 transition-colors hover:text-muted"
+          >
+            Admin
+          </Link>
         </div>
       </div>
     </footer>

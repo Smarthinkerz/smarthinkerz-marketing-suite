@@ -5,19 +5,25 @@ import { Menu, X } from "lucide-react";
 import { Sidebar } from "./sidebar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { UserMenu } from "./user-menu";
+import { WorkspaceSwitcher } from "./workspace-switcher";
+import { WorkspaceProvider } from "@/lib/workspace-context";
 import type { SessionUser } from "@/lib/types";
+import type { MyWorkspace } from "@/lib/org-types";
 import { cn } from "@/lib/utils";
 
 export function DashboardShell({
   user,
+  workspaces,
   children,
 }: {
   user: SessionUser;
+  workspaces: MyWorkspace[];
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
 
   return (
+    <WorkspaceProvider workspaces={workspaces}>
     <div className="min-h-screen bg-background lg:grid lg:grid-cols-[280px_1fr]">
       {/* Desktop sidebar */}
       <aside className="sticky top-0 hidden h-screen border-r border-border bg-surface lg:block">
@@ -43,14 +49,18 @@ export function DashboardShell({
 
       <div className="flex min-h-screen flex-col">
         <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border bg-background/80 px-4 backdrop-blur-md lg:px-8">
-          <button
-            onClick={() => setOpen(true)}
-            aria-label="Open menu"
-            className={cn("rounded-lg p-2 text-foreground hover:bg-surface-2 lg:hidden")}
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-          <div className="hidden lg:block" />
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setOpen(true)}
+              aria-label="Open menu"
+              className={cn("rounded-lg p-2 text-foreground hover:bg-surface-2 lg:hidden")}
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            <div className="hidden sm:block">
+              <WorkspaceSwitcher />
+            </div>
+          </div>
           <div className="flex items-center gap-3">
             <ThemeToggle />
             <UserMenu user={user} />
@@ -60,5 +70,6 @@ export function DashboardShell({
         <main className="flex-1 p-4 lg:p-8">{children}</main>
       </div>
     </div>
+    </WorkspaceProvider>
   );
 }

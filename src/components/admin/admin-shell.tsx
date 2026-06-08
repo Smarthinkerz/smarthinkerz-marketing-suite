@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Menu, X, LayoutDashboard, FileEdit, BarChart3, Users, ArrowLeft, ShieldCheck, Settings } from "lucide-react";
+import { Menu, X, LayoutDashboard, FileEdit, BarChart3, Users, ArrowLeft, ShieldCheck, Settings, KeyRound } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { UserMenu } from "@/components/dashboard/user-menu";
 import { Logo } from "@/components/brand/logo";
@@ -15,6 +15,7 @@ const NAV = [
   { href: "/admin/cms", label: "Front Page Editor", icon: FileEdit },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin/sso", label: "SSO Configuration", icon: KeyRound },
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
