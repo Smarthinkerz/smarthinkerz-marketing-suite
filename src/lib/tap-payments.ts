@@ -2,13 +2,13 @@
  * Tap Payments API helpers — server-side only.
  *
  * Tap API reference: https://developers.tap.company/reference
- * All amounts are in the smallest currency unit (fils for AED: 1 AED = 100 fils).
+ * All amounts are in the smallest currency unit (cents for USD: 1 USD = 100 cents).
  *
  * SmarThinkerz scheme:
  *   platform: "smarthinkerz-academy"
  *   metadata: { userId, trackSlug, installmentCount, platform }
  *   description: "Smarthinkerz Academy - <Track Name>"
- *   redirect: { url: "https://smarthinkerzacademy.com/payment/success" }
+ *   redirect: { url: "https://smarthinkerz.com/payment/success" }
  *   source: { id: "src_all" }  — Tap hosted page, all payment methods
  *
  * NEVER import this file in Client Components.
@@ -35,8 +35,8 @@ export interface TapCustomer {
  * Metadata follows the SmarThinkerz Academy scheme exactly.
  */
 export interface TapChargeInput {
-  /** Amount in AED (decimal, e.g. 7999.00). Converted to fils internally. */
-  amountAed: number;
+  /** Amount in USD (decimal, e.g. 1999.00). Converted to cents internally. */
+  amountUsd: number;
   /** "Smarthinkerz Academy - <Track Name>" */
   description: string;
   customer: TapCustomer;
@@ -158,14 +158,14 @@ function tapHeaders(): HeadersInit {
 export async function createTapCharge(
   input: TapChargeInput,
 ): Promise<{ ok: true; charge: TapChargeResponse } | { ok: false; error: string }> {
-  const { amountAed, description, customer, metadata, redirectUrl } = input;
+  const { amountUsd, description, customer, metadata, redirectUrl } = input;
 
-  // Tap expects amount in fils (smallest unit): 1 AED = 100 fils
-  const amountInFils = Math.round(amountAed * 100);
+  // Tap expects amount in cents (smallest unit): 1 USD = 100 cents
+  const amountInCents = Math.round(amountUsd * 100);
 
   const body = {
-    amount: amountInFils,
-    currency: "AED",
+    amount: amountInCents,
+    currency: "USD",
     description,
     customer: {
       first_name: customer.first_name,

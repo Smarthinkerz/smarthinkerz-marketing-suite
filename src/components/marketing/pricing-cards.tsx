@@ -4,10 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { TRACK_LIST } from "@/lib/plans";
 import { cn } from "@/lib/utils";
 
-function fmtAed(amount: number) {
-  return new Intl.NumberFormat("en-AE", {
+function fmtUsd(amount: number) {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "AED",
+    currency: "USD",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
@@ -46,12 +46,12 @@ export function PricingCards({ compact = false }: { compact?: boolean }) {
             {/* Price */}
             <div className="mt-4 flex items-end gap-1">
               <span className="text-4xl font-extrabold text-foreground">
-                {fmtAed(track.totalAed)}
+                {fmtUsd(track.totalUsd)}
               </span>
               <span className="mb-1 text-sm text-muted">total</span>
             </div>
             <p className="mt-0.5 text-xs text-muted">
-              Billed in AED · Tap Payments · Installments available
+              Billed in USD · Tap Payments · Installments available
             </p>
 
             <Button

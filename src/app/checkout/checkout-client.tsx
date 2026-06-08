@@ -9,10 +9,10 @@ import { TRACK_LIST, resolveTrack, type TrackDefinition } from "@/lib/plans";
 import { createCheckoutSession, INSTALLMENT_OPTIONS } from "./actions";
 import type { SessionUser } from "@/lib/types";
 
-function fmtAed(amount: number): string {
-  return new Intl.NumberFormat("en-AE", {
+function fmtUsd(amount: number): string {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "AED",
+    currency: "USD",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
@@ -44,8 +44,8 @@ export function CheckoutClient({
   const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const totalAed = selectedTrack.totalAed;
-  const installmentAed = Math.round((totalAed / installmentCount) * 100) / 100;
+  const totalUsd = selectedTrack.totalUsd;
+  const installmentUsd = Math.round((totalUsd / installmentCount) * 100) / 100;
 
   function handleProceed() {
     setError(null);
@@ -122,7 +122,7 @@ export function CheckoutClient({
                           <p className="mt-0.5 text-xs text-muted">{t.description}</p>
                         </div>
                         <div className="shrink-0 text-right">
-                          <p className="text-lg font-bold text-foreground">{fmtAed(t.totalAed)}</p>
+                          <p className="text-lg font-bold text-foreground">{fmtUsd(t.totalUsd)}</p>
                           <p className="flex items-center justify-end gap-0.5 text-xs text-muted">
                             <Clock className="h-3 w-3" />
                             {t.durationMonths} months
@@ -158,7 +158,7 @@ export function CheckoutClient({
               <div className="grid gap-2 sm:grid-cols-2">
                 {Object.entries(INSTALLMENT_OPTIONS).map(([count, label]) => {
                   const n = parseInt(count, 10);
-                  const perInstallment = Math.round((totalAed / n) * 100) / 100;
+                  const perInstallment = Math.round((totalUsd / n) * 100) / 100;
                   const isSelected = installmentCount === n;
                   return (
                     <button
@@ -173,8 +173,8 @@ export function CheckoutClient({
                       <p className="font-medium text-foreground">{label}</p>
                       <p className="text-xs text-muted">
                         {n === 1
-                          ? fmtAed(totalAed) + " today"
-                          : fmtAed(perInstallment) + " × " + n + " payments"}
+                          ? fmtUsd(totalUsd) + " today"
+                          : fmtUsd(perInstallment) + " × " + n + " payments"}
                       </p>
                     </button>
                   );
@@ -221,7 +221,7 @@ export function CheckoutClient({
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted">Currency</span>
-                  <span className="font-medium text-foreground">AED</span>
+                  <span className="font-medium text-foreground">USD</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted">Platform</span>
@@ -231,12 +231,12 @@ export function CheckoutClient({
                 <div className="border-t border-border pt-3">
                   <div className="flex justify-between">
                     <span className="text-muted">Total</span>
-                    <span className="text-lg font-bold text-foreground">{fmtAed(totalAed)}</span>
+                    <span className="text-lg font-bold text-foreground">{fmtUsd(totalUsd)}</span>
                   </div>
                   {installmentCount > 1 && (
                     <div className="mt-1 flex justify-between text-xs">
                       <span className="text-muted">Per installment</span>
-                      <span className="font-medium text-foreground">{fmtAed(installmentAed)}</span>
+                      <span className="font-medium text-foreground">{fmtUsd(installmentUsd)}</span>
                     </div>
                   )}
                 </div>
@@ -260,7 +260,7 @@ export function CheckoutClient({
               {/* AI token budget note */}
               <div className="mt-4 rounded-md bg-surface-2 px-3 py-2.5 text-xs text-muted">
                 <span className="font-medium text-foreground">Sophia AI budget:</span>{" "}
-                {fmtAed(Math.round(totalAed * 0.1))} of your payment is allocated to Sophia AI
+                {fmtUsd(Math.round(totalUsd * 0.1))} of your payment is allocated to Sophia AI
                 usage credits.
               </div>
 

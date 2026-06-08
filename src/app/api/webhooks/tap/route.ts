@@ -139,7 +139,7 @@ async function handleCaptured(charge: TapChargeEvent): Promise<string> {
   const trackSlug = meta.trackSlug ?? pending?.plan_key ?? meta.planKey ?? "";
   const installmentCount = pending?.installment_count ?? parseInt(meta.installmentCount ?? "1", 10);
   const installmentAmount = pending?.installment_amount ?? (charge.amount / 100 / installmentCount);
-  const totalAmountAed = pending?.total_amount_aed ?? (charge.amount / 100);
+  const totalAmountAed = pending?.total_amount_usd ?? (charge.amount / 100);
 
   // Resolve internal tier from track slug (SmarThinkerz Academy scheme)
   const resolvedTierFromTrack = tierFromTrackSlug(trackSlug);
@@ -188,7 +188,7 @@ async function handleCaptured(charge: TapChargeEvent): Promise<string> {
     installment_count: installmentCount,
     installments_paid: newInstallmentsPaid,
     installment_amount: installmentAmount,
-    total_amount_aed: totalAmountAed,
+    total_amount_usd: totalAmountAed,
     ai_token_budget: newTokenBudget,
     current_period_start: now.toISOString(),
     current_period_end: periodEnd.toISOString(),
@@ -199,13 +199,13 @@ async function handleCaptured(charge: TapChargeEvent): Promise<string> {
   // 4. Record invoice
   await supabase.from("invoices").insert({
     user_id: userId,
-    amount: charge.amount / 100, // convert fils → AED
-    currency: "AED",
+    amount: charge.amount / 100, // convert cents → USD
+    currency: "USD",
     status: "paid",
     hub_charge_id: charge.id,
     tap_charge_id: charge.id,
     installment_number: newInstallmentsPaid,
-    currency_override: "AED",
+    currency_override: "USD",
   });
 
   // 5. Mark pending charge as captured
@@ -226,7 +226,7 @@ async function handleCaptured(charge: TapChargeEvent): Promise<string> {
         trackSlug,
         platform: meta.platform ?? "smarthinkerz-academy",
         chargeId: charge.id,
-        amountAed: charge.amount / 100,
+        amountUsd: charge.amount / 100,
         installmentNumber: newInstallmentsPaid,
       },
   });

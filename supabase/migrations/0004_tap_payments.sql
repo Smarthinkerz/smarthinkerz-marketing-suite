@@ -23,7 +23,7 @@ alter table public.subscriptions
   -- 10% of each payment allocated to Sophia AI token budget
   add column if not exists ai_token_budget numeric(12,2) not null default 0,
   -- Total amount paid in AED
-  add column if not exists total_amount_aed numeric(12,2),
+  add column if not exists total_amount_usd numeric(12,2),
   -- Current period start (set on first CAPTURED event)
   add column if not exists current_period_start timestamptz;
 
@@ -56,7 +56,7 @@ create table if not exists public.tap_pending_charges (
   plan_key text not null,                    -- e.g. "smarthinkerz-pro-monthly"
   tier text not null,                        -- internal tier: basic|pro|business|enterprise
   cycle text not null default 'monthly',     -- monthly | yearly
-  total_amount_aed numeric(12,2) not null,
+  total_amount_usd numeric(12,2) not null,
   installment_count integer not null default 1,
   installment_amount numeric(12,2),
   status text not null default 'pending',    -- pending | captured | failed | refunded

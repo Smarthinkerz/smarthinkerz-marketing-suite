@@ -207,8 +207,8 @@ export interface TrackDefinition {
   /** Human-readable alias (URL param alias) */
   alias: string;
   name: string;
-  /** Total price in AED (full payment) */
-  totalAed: number;
+  /** Total price in USD (full payment) */
+  totalUsd: number;
   /** Duration in months */
   durationMonths: number;
   /** Internal marketing-suite tier this track maps to */
@@ -223,7 +223,7 @@ export const TRACKS: Record<TrackSlug, TrackDefinition> = {
     slug: "2-month-sprint",
     alias: "foundations",
     name: "Foundations Sprint",
-    totalAed: 1499,
+    totalUsd: 399,
     durationMonths: 2,
     tier: "basic",
     description: "2-month intensive to master marketing fundamentals.",
@@ -239,7 +239,7 @@ export const TRACKS: Record<TrackSlug, TrackDefinition> = {
     slug: "3-month-accelerator",
     alias: "accelerator",
     name: "Accelerator Program",
-    totalAed: 2999,
+    totalUsd: 799,
     durationMonths: 3,
     tier: "pro",
     description: "3-month accelerator for growing marketing teams.",
@@ -257,7 +257,7 @@ export const TRACKS: Record<TrackSlug, TrackDefinition> = {
     slug: "6-month-professional",
     alias: "professional",
     name: "Professional Track",
-    totalAed: 7999,
+    totalUsd: 1999,
     durationMonths: 6,
     tier: "business",
     description: "6-month professional program for agencies and power users.",
@@ -275,7 +275,7 @@ export const TRACKS: Record<TrackSlug, TrackDefinition> = {
     slug: "12-month-master",
     alias: "master",
     name: "Master Program",
-    totalAed: 14999,
+    totalUsd: 3999,
     durationMonths: 12,
     tier: "enterprise",
     description: "12-month mastery program with full Enterprise access.",

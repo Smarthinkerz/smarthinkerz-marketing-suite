@@ -9,20 +9,20 @@ import { PLAN_LIST, PLANS, tierRank, type Tier } from "@/lib/plans";
 import { formatDate } from "@/lib/utils";
 import type { Invoice, SessionUser } from "@/lib/types";
 
-// AED formatting
-const USD_TO_AED = 3.67;
+// USD formatting
+const USD_TO_USD = 3.67;
 function toAed(usd: number) {
-  return Math.round(usd * USD_TO_AED * 100) / 100;
+  return Math.round(usd * USD_TO_USD * 100) / 100;
 }
-function fmtAed(amount: number) {
-  return new Intl.NumberFormat("en-AE", {
+function fmtUsd(amount: number) {
+  return new Intl.NumberFormat("en-US", {
     style: "currency",
-    currency: "AED",
+    currency: "USD",
     minimumFractionDigits: 2,
   }).format(amount);
 }
 function fmtCurrency(amount: number, currency?: string | null) {
-  if (currency?.toUpperCase() === "AED") return fmtAed(amount);
+  if (currency?.toUpperCase() === "USD") return fmtUsd(amount);
   // Legacy USD invoices
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -182,7 +182,7 @@ export function BillingClient({
                 )}
                 <p className="font-semibold text-foreground">{p.name}</p>
                 <p className="mt-1 text-2xl font-bold text-foreground">
-                  {fmtAed(priceAed)}
+                  {fmtUsd(priceAed)}
                   <span className="text-sm font-normal text-muted">/{cycle === "yearly" ? "yr" : "mo"}</span>
                 </p>
                 <ul className="mt-3 space-y-1.5">

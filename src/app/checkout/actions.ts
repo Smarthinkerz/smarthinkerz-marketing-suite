@@ -61,9 +61,9 @@ export async function createCheckoutSession(
     return { ok: false, error: "Invalid track selected." };
   }
 
-  // Amounts in AED (from spec)
-  const totalAed = track.totalAed;
-  const installmentAmount = Math.round((totalAed / installmentCount) * 100) / 100;
+  // Amounts in USD
+  const totalUsd = track.totalUsd;
+  const installmentAmount = Math.round((totalUsd / installmentCount) * 100) / 100;
 
   // Parse customer name
   const fullName = user.fullName ?? user.email;
@@ -80,7 +80,7 @@ export async function createCheckoutSession(
 
   // Create Tap charge per spec
   const result = await createTapCharge({
-    amountAed: totalAed,
+    amountUsd: totalUsd,
     // Description format per spec: "Smarthinkerz Academy - <Plan Name>"
     description: `Smarthinkerz Academy - ${track.name}`,
     customer: {
@@ -112,7 +112,7 @@ export async function createCheckoutSession(
     plan_key: track.slug,       // stored as plan_key in DB (track slug)
     tier: track.tier,
     cycle: `${track.durationMonths}-month`, // e.g. "6-month"
-    total_amount_aed: totalAed,
+    total_amount_usd: totalUsd,             // column name kept for DB compat; value is USD
     installment_count: installmentCount,
     installment_amount: installmentAmount,
     status: "pending",
@@ -122,7 +122,7 @@ export async function createCheckoutSession(
     ok: true,
     checkoutUrl: charge.transaction.url,
     chargeId: charge.id,
-    amount: totalAed,
+    amount: totalUsd,
     installmentCount,
     installmentAmount,
   };
