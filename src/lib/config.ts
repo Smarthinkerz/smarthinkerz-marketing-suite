@@ -35,10 +35,33 @@ export const config = {
   },
 
   /**
-   * Billing is handled by an external, hosted Payment Hub (hosted checkout page
-   * + signed webhook). This app never touches card data and integrates no card
-   * processor directly. All values are configurable via env so the product is
-   * decoupled from any specific payment provider.
+   * Tap Payments — direct integration (no payment hub intermediary).
+   *
+   * TAP_SECRET_KEY:    From Tap Dashboard → Developers → API Keys → Secret Key
+   * TAP_WEBHOOK_SECRET: Tap uses the same secret key for HMAC-SHA256 webhook
+   *                     verification. Set this to the same value as TAP_SECRET_KEY
+   *                     unless you configure a separate webhook secret in the Tap
+   *                     Dashboard.
+   *
+   * Tap Dashboard setup:
+   *   1. Log in to business.tap.company
+   *   2. Developers → API Keys → copy Secret Key → set as TAP_SECRET_KEY
+   *   3. Developers → Webhooks → add https://yourdomain.com/api/webhooks/tap
+   *      → select events: charge.captured, charge.failed, charge.refunded
+   */
+  tap: {
+    secretKey: get("TAP_SECRET_KEY"),
+    /** Tap uses the secret key for HMAC-SHA256 webhook verification. */
+    webhookSecret: get("TAP_WEBHOOK_SECRET") ?? get("TAP_SECRET_KEY"),
+    get isConfigured() {
+      return Boolean(this.secretKey);
+    },
+  },
+
+  /**
+   * Legacy payment-hub config — kept for backward compatibility.
+   * New installations should use the `tap` config above.
+   * @deprecated Use config.tap instead.
    */
   payments: {
     checkoutBaseUrl: get("NEXT_PUBLIC_PAYMENT_HUB_CHECKOUT_URL") ?? "",
@@ -63,5 +86,5 @@ export const config = {
 export const isProductionReady =
   config.supabase.isConfigured &&
   config.openai.isConfigured &&
-  config.payments.isConfigured &&
+  config.tap.isConfigured &&
   config.resend.isConfigured;

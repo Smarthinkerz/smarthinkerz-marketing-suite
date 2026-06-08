@@ -14,7 +14,11 @@ const FAQ = [
   },
   {
     q: "What payment methods are supported?",
-    a: "Billing is processed securely through our hosted payment provider, supporting major cards and regional methods.",
+    a: "Billing is processed securely through Tap Payments, supporting Visa, Mastercard, AMEX, mada, KNET, and other regional payment methods. Installment options (2–4 payments) are available on all plans.",
+  },
+  {
+    q: "Can I pay in installments?",
+    a: "Yes. At checkout you can split your payment into 2, 3, or 4 monthly installments. Each installment is charged separately via Tap Payments.",
   },
   {
     q: "Is my data portable?",
@@ -52,7 +56,7 @@ export default function PricingPage() {
           </h2>
           <dl className="mt-8 space-y-4">
             {FAQ.map((item) => (
-              <div key={item.q} className="rounded-2xl border border-border bg-background p-6">
+              <div key={item.q} className="rounded-lg border border-border bg-background p-6">
                 <dt className="font-semibold text-foreground">{item.q}</dt>
                 <dd className="mt-2 text-sm text-muted">{item.a}</dd>
               </div>

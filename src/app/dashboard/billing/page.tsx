@@ -2,7 +2,7 @@ import { resolveUser } from "@/lib/session";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { getBillingData } from "./actions";
 import { BillingClient } from "./billing-client";
-import { isCheckoutConfigured } from "@/lib/billing";
+import { config } from "@/lib/config";
 
 export default async function BillingPage() {
   const user = await resolveUser();
@@ -14,13 +14,12 @@ export default async function BillingPage() {
         title="Billing & Plan"
         description="Manage your subscription, usage, and invoices."
         icon="CreditCard"
-        accent="#6366f1"
       />
       <BillingClient
         user={user}
         invoices={data.invoices}
         usage={data.usage}
-        checkoutConfigured={isCheckoutConfigured()}
+        tapConfigured={config.tap.isConfigured}
       />
     </div>
   );
