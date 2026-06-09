@@ -77,18 +77,21 @@ create index if not exists tap_pending_charges_status_idx
 alter table public.tap_pending_charges enable row level security;
 
 -- Users can read their own pending charges (for status polling)
-create policy if not exists "tap_pending_charges: owner read"
+drop policy if exists "tap_pending_charges: owner read" on public.tap_pending_charges;
+create policy "tap_pending_charges: owner read"
   on public.tap_pending_charges
   for select
   using (auth.uid() = user_id);
 
 -- Only service role can insert/update (done server-side, never from client)
-create policy if not exists "tap_pending_charges: service insert"
+drop policy if exists "tap_pending_charges: service insert" on public.tap_pending_charges;
+create policy "tap_pending_charges: service insert"
   on public.tap_pending_charges
   for insert
   with check (true);
 
-create policy if not exists "tap_pending_charges: service update"
+drop policy if exists "tap_pending_charges: service update" on public.tap_pending_charges;
+create policy "tap_pending_charges: service update"
   on public.tap_pending_charges
   for update
   using (true);
