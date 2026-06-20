@@ -2,7 +2,12 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { getSessionUser } from "@/lib/auth";
-import { createTapCharge, parseTapPhone } from "@/lib/tap-payments";
+import {
+  createTapCharge,
+  parseTapPhone,
+  generateTransactionRef,
+  generateOrderRef,
+} from "@/lib/tap-payments";
 import { config } from "@/lib/config";
 import { resolveTrack, TRACK_LIST } from "@/lib/plans";
 
@@ -11,9 +16,8 @@ export type CheckoutResult =
       ok: true;
       checkoutUrl: string;
       chargeId: string;
+      orderId: string;
       amount: number;
-      installmentCount: number;
-      installmentAmount: number;
     }
   | {
       ok: false;
@@ -21,17 +25,13 @@ export type CheckoutResult =
     };
 
 export interface CreateCheckoutInput {
-  /**
-   * Track slug (canonical or alias).
-   * Canonical: "2-month-sprint" | "3-month-accelerator" | "6-month-professional" | "12-month-master"
-   * Alias:     "foundations"    | "accelerator"          | "professional"          | "master"
-   */
   trackSlug: string;
-  installmentCount: number; // 1 = pay in full
-  phone?: string;           // optional, for Tap customer object
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
 }
 
-// Installment options (count → label)
 export const INSTALLMENT_OPTIONS: Record<number, string> = {
   1: "Pay in full",
   2: "2 installments",
@@ -50,53 +50,49 @@ export async function createCheckoutSession(
   }
 
   if (!config.tap.isConfigured) {
-    return { ok: false, error: "Payment processing is not configured. Please contact support." };
+    return {
+      ok: false,
+      error: "Payment processing is not configured. Set TAP_SECRET_KEY to enable live checkout.",
+    };
   }
 
-  const { trackSlug, installmentCount, phone } = input;
+  const { trackSlug, firstName, lastName, email, phone } = input;
 
-  // Resolve track by canonical slug or alias
   const track = resolveTrack(trackSlug);
   if (!track) {
     return { ok: false, error: "Invalid track selected." };
   }
 
-  // Amounts in USD
-  const totalUsd = track.totalUsd;
-  const installmentAmount = Math.round((totalUsd / installmentCount) * 100) / 100;
+  const amount = track.totalUsd;
+  const appUrl = config.appUrl;
 
-  // Parse customer name
-  const fullName = user.fullName ?? user.email;
-  const nameParts = fullName.split(" ");
-  const firstName = nameParts[0] ?? "Customer";
-  const lastName = nameParts.slice(1).join(" ") || "—";
+  const transactionRef = generateTransactionRef(track.slug, `${track.durationMonths}-month`);
+  const orderRef = generateOrderRef();
 
-  // Parse phone if provided
   const parsedPhone = phone ? parseTapPhone(phone) : undefined;
 
-  // Build redirect URL (per spec: https://smarthinkerzacademy.com/payment/success)
-  const appUrl = config.appUrl;
-  const redirectUrl = `${appUrl}/payment/success`;
-
-  // Create Tap charge per spec
   const result = await createTapCharge({
-    amountUsd: totalUsd,
-    // Description format per spec: "Smarthinkerz Academy - <Plan Name>"
-    description: `Smarthinkerz Academy - ${track.name}`,
+    amount,
+    description: `SmarThinkerz - ${track.name}`,
+    statementDescriptor: "SmarThinkerz",
     customer: {
       first_name: firstName,
       last_name: lastName,
-      email: user.email,
+      email,
       phone: parsedPhone,
     },
-    // Metadata per spec: userId, trackSlug, installmentCount, platform
     metadata: {
+      plan: track.slug,
+      cycle: `${track.durationMonths}-month`,
+      product: "SmarThinkerz Academy",
+      display: "SmarThinkerz Academy",
+      plan_name: track.name,
       userId: user.id,
-      trackSlug: track.slug,
-      installmentCount: String(installmentCount),
-      platform: "smarthinkerz-academy",
     },
-    redirectUrl,
+    redirectUrl: `${appUrl}/checkout/return`,
+    postUrl: `${appUrl}/api/tap/webhook`,
+    transactionRef,
+    orderRef,
   });
 
   if (!result.ok) {
@@ -105,28 +101,38 @@ export async function createCheckoutSession(
 
   const { charge } = result;
 
-  // Record pending charge in DB for webhook correlation
-  await supabase.from("tap_pending_charges").insert({
-    tap_charge_id: charge.id,
-    user_id: user.id,
-    plan_key: track.slug,       // stored as plan_key in DB (track slug)
-    tier: track.tier,
-    cycle: `${track.durationMonths}-month`, // e.g. "6-month"
-    total_amount_usd: totalUsd,             // column name kept for DB compat; value is USD
-    installment_count: installmentCount,
-    installment_amount: installmentAmount,
-    status: "pending",
-  });
+  const { data: order, error: dbError } = await supabase
+    .from("orders")
+    .insert({
+      user_id: user.id,
+      tap_charge_id: charge.id,
+      plan: track.slug,
+      plan_name: track.name,
+      product: "SmarThinkerz Academy",
+      amount,
+      currency: "USD",
+      status: "initiated",
+      customer_first_name: firstName,
+      customer_last_name: lastName,
+      customer_email: email,
+      customer_phone: phone ?? null,
+      transaction_ref: transactionRef,
+      order_ref: orderRef,
+    })
+    .select("id")
+    .single();
+
+  if (dbError) {
+    console.error("[checkout] Failed to insert order:", dbError.message);
+  }
 
   return {
     ok: true,
     checkoutUrl: charge.transaction.url,
     chargeId: charge.id,
-    amount: totalUsd,
-    installmentCount,
-    installmentAmount,
+    orderId: order?.id ?? "",
+    amount,
   };
 }
 
-// Re-export track list for the client component
 export { TRACK_LIST };

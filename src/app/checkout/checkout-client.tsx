@@ -6,7 +6,7 @@ import { Check, CreditCard, Loader2, ShieldCheck, AlertCircle, Clock } from "luc
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { TRACK_LIST, resolveTrack, type TrackDefinition } from "@/lib/plans";
-import { createCheckoutSession, INSTALLMENT_OPTIONS } from "./actions";
+import { createCheckoutSession } from "./actions";
 import type { SessionUser } from "@/lib/types";
 
 function fmtUsd(amount: number): string {
@@ -40,19 +40,25 @@ export function CheckoutClient({
     TRACK_LIST[1];
 
   const [selectedTrack, setSelectedTrack] = useState<TrackDefinition>(defaultTrack);
-  const [installmentCount, setInstallmentCount] = useState(1);
   const [phone, setPhone] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const totalUsd = selectedTrack.totalUsd;
-  const installmentUsd = Math.round((totalUsd / installmentCount) * 100) / 100;
+
+  // Pre-fill name/email from session
+  const fullName = user.fullName ?? user.email ?? "";
+  const nameParts = fullName.split(" ");
+  const firstName = nameParts[0] ?? "Customer";
+  const lastName = nameParts.slice(1).join(" ") || "—";
 
   function handleProceed() {
     setError(null);
     startTransition(async () => {
       const result = await createCheckoutSession({
         trackSlug: selectedTrack.slug,
-        installmentCount,
+        firstName,
+        lastName,
+        email: user.email ?? "",
         phone: phone.trim() || undefined,
       });
 
@@ -98,10 +104,7 @@ export function CheckoutClient({
                   return (
                     <button
                       key={t.slug}
-                      onClick={() => {
-                        setSelectedTrack(t);
-                        setInstallmentCount(1); // reset installments on track change
-                      }}
+                      onClick={() => setSelectedTrack(t)}
                       style={{
                         outline: isSelected ? "2px solid var(--color-primary)" : "none",
                       }}
@@ -150,42 +153,10 @@ export function CheckoutClient({
               </div>
             </section>
 
-            {/* Step 2: Payment Option */}
+            {/* Step 2: Phone (optional) */}
             <section>
               <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
-                2. Payment Option
-              </h2>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {Object.entries(INSTALLMENT_OPTIONS).map(([count, label]) => {
-                  const n = parseInt(count, 10);
-                  const perInstallment = Math.round((totalUsd / n) * 100) / 100;
-                  const isSelected = installmentCount === n;
-                  return (
-                    <button
-                      key={count}
-                      onClick={() => setInstallmentCount(n)}
-                      className={`rounded-md border px-4 py-3 text-left text-sm transition-colors ${
-                        isSelected
-                          ? "border-primary bg-primary/5 text-primary"
-                          : "border-border text-muted hover:border-primary/40"
-                      }`}
-                    >
-                      <p className="font-medium text-foreground">{label}</p>
-                      <p className="text-xs text-muted">
-                        {n === 1
-                          ? fmtUsd(totalUsd) + " today"
-                          : fmtUsd(perInstallment) + " × " + n + " payments"}
-                      </p>
-                    </button>
-                  );
-                })}
-              </div>
-            </section>
-
-            {/* Step 3: Phone (optional) */}
-            <section>
-              <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">
-                3. Phone Number{" "}
+                2. Phone Number{" "}
                 <span className="normal-case font-normal text-muted">(optional)</span>
               </h2>
               <input
@@ -223,22 +194,12 @@ export function CheckoutClient({
                   <span className="text-muted">Currency</span>
                   <span className="font-medium text-foreground">USD</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-muted">Platform</span>
-                  <span className="font-medium text-foreground">Smarthinkerz Academy</span>
-                </div>
 
                 <div className="border-t border-border pt-3">
                   <div className="flex justify-between">
                     <span className="text-muted">Total</span>
                     <span className="text-lg font-bold text-foreground">{fmtUsd(totalUsd)}</span>
                   </div>
-                  {installmentCount > 1 && (
-                    <div className="mt-1 flex justify-between text-xs">
-                      <span className="text-muted">Per installment</span>
-                      <span className="font-medium text-foreground">{fmtUsd(installmentUsd)}</span>
-                    </div>
-                  )}
                 </div>
               </div>
 
