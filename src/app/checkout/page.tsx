@@ -19,6 +19,8 @@ interface CheckoutPageProps {
     track?: string;
     /** Legacy alias — also accepted as track identifier */
     plan?: string;
+    /** Legacy tier param from billing page (e.g. "basic" | "pro" | "business" | "enterprise") */
+    tier?: string;
   }>;
 }
 
@@ -29,8 +31,17 @@ export default async function CheckoutPage({ searchParams }: CheckoutPageProps) 
   }
 
   const params = await searchParams;
-  // Accept both ?track= and legacy ?plan= param
-  const initialTrack = params.track ?? params.plan;
+  // Accept ?track=, ?plan=, and legacy ?tier= (maps tier alias to track alias)
+  const tierToAlias: Record<string, string> = {
+    basic: "foundations",
+    pro: "accelerator",
+    business: "professional",
+    enterprise: "master",
+  };
+  const initialTrack =
+    params.track ??
+    params.plan ??
+    (params.tier ? tierToAlias[params.tier] ?? params.tier : undefined);
 
   return (
     <CheckoutClient

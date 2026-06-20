@@ -5,7 +5,7 @@ import { Check, CreditCard, FileText, Layers } from "lucide-react";
 import { Card, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { PLAN_LIST, PLANS, tierRank, type Tier } from "@/lib/plans";
+import { PLAN_LIST, PLANS, TRACK_LIST, tierRank, type Tier } from "@/lib/plans";
 import { formatDate } from "@/lib/utils";
 import type { Invoice, SessionUser } from "@/lib/types";
 
@@ -163,7 +163,9 @@ export function BillingClient({
           {PLAN_LIST.map((p) => {
             const isCurrent = p.id === user.tier;
             const priceAed = toAed(cycle === "yearly" ? p.priceYearly : p.priceMonthly);
-            const checkoutUrl = `/checkout?tier=${p.id}&cycle=${cycle}`;
+            // Map tier → track slug for the checkout URL
+            const track = TRACK_LIST.find((t) => t.tier === p.id);
+            const checkoutUrl = track ? `/checkout?track=${track.slug}` : `/checkout?plan=${p.id}`;
             const direction =
               tierRank(p.id) > tierRank(user.tier)
                 ? "Upgrade"
