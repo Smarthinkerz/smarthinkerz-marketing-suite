@@ -10,10 +10,6 @@ import { formatDate } from "@/lib/utils";
 import type { Invoice, SessionUser } from "@/lib/types";
 
 // USD formatting
-const USD_TO_USD = 3.67;
-function toAed(usd: number) {
-  return Math.round(usd * USD_TO_USD * 100) / 100;
-}
 function fmtUsd(amount: number) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -162,7 +158,7 @@ export function BillingClient({
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {PLAN_LIST.map((p) => {
             const isCurrent = p.id === user.tier;
-            const priceAed = toAed(cycle === "yearly" ? p.priceYearly : p.priceMonthly);
+            const priceUsd = cycle === "yearly" ? p.priceYearly : p.priceMonthly;
             // Map tier → track slug for the checkout URL
             const track = TRACK_LIST.find((t) => t.tier === p.id);
             const checkoutUrl = track ? `/checkout?track=${track.slug}` : `/checkout?plan=${p.id}`;
@@ -184,7 +180,7 @@ export function BillingClient({
                 )}
                 <p className="font-semibold text-foreground">{p.name}</p>
                 <p className="mt-1 text-2xl font-bold text-foreground">
-                  {fmtUsd(priceAed)}
+                  {fmtUsd(priceUsd)}
                   <span className="text-sm font-normal text-muted">/{cycle === "yearly" ? "yr" : "mo"}</span>
                 </p>
                 <ul className="mt-3 space-y-1.5">
