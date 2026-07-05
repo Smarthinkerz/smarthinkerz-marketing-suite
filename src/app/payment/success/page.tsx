@@ -16,7 +16,7 @@ import { CheckCircle2, ArrowRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const metadata: Metadata = {
-  title: "Payment Successful — Smarthinkerz Academy",
+  title: "Payment Successful — SmarThinkerz",
   description: "Your payment has been received.",
 };
 
@@ -69,7 +69,7 @@ export default async function PaymentSuccessPage({ searchParams }: SuccessPagePr
             <p className="text-sm font-medium text-foreground">Account activation in progress</p>
             <p className="mt-0.5 text-xs text-muted">
               Your program access will be activated automatically within a few minutes once payment
-              confirmation is received. You will have full access to all Smarthinkerz Academy tools shortly.
+              confirmation is received. You will have full access to all SmarThinkerz tools shortly.
             </p>
           </div>
         </div>

@@ -5,8 +5,8 @@ import { config } from "@/lib/config";
 import { CheckoutClient } from "./checkout-client";
 
 export const metadata: Metadata = {
-  title: "Checkout — Smarthinkerz Academy",
-  description: "Complete your enrollment in a Smarthinkerz Academy program.",
+  title: "Checkout — SmarThinkerz",
+  description: "Complete your enrollment in a SmarThinkerz program.",
 };
 
 interface CheckoutPageProps {

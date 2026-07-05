@@ -185,7 +185,7 @@ export function minTierForTool(tool: ToolKey): Tier {
 }
 
 // ---------------------------------------------------------------------------
-// SmarThinkerz Academy — Track / Plan definitions
+// SmarThinkerz — Track / Plan definitions
 // ---------------------------------------------------------------------------
 // These are the four fixed-duration tracks sold via Tap Payments.
 // URL param: ?track=<slug>  or  ?plan=<planKey>

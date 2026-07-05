@@ -78,7 +78,7 @@ export function CheckoutClient({
       <div className="border-b border-border bg-surface px-4 py-4">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <div>
-            <p className="text-sm font-semibold text-foreground">Smarthinkerz Academy</p>
+            <p className="text-sm font-semibold text-foreground">SmarThinkerz</p>
             <p className="text-xs text-muted">Secure checkout powered by Tap Payments</p>
           </div>
           <div className="flex items-center gap-1.5 text-xs text-muted">

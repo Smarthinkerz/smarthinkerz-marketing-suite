@@ -11,7 +11,7 @@ export default function CheckoutSuccessPage() {
         <CheckCircle className="mx-auto mb-4 h-16 w-16 text-success" />
         <h1 className="text-2xl font-bold text-foreground">Payment Successful!</h1>
         <p className="mt-3 text-sm text-muted">
-          Your payment has been confirmed. Welcome to SmarThinkerz Academy — your access is now active.
+          Your payment has been confirmed. Welcome to SmarThinkerz — your access is now active.
         </p>
         <p className="mt-2 text-xs text-muted">
           A receipt has been sent to your email address.

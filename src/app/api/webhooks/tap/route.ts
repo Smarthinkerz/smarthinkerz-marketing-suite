@@ -33,7 +33,7 @@ interface TapChargeEvent {
   description?: string;
   metadata?: {
     userId?: string;
-    /** SmarThinkerz Academy scheme: canonical track slug e.g. "6-month-professional" */
+    /** SmarThinkerz scheme: canonical track slug e.g. "6-month-professional" */
     trackSlug?: string;
     installmentCount?: string;
     platform?: string;
@@ -135,13 +135,13 @@ async function handleCaptured(charge: TapChargeEvent): Promise<string> {
     return "error:no-user-id";
   }
 
-  // Resolve plan details — prefer SmarThinkerz Academy trackSlug scheme
+  // Resolve plan details — prefer SmarThinkerz trackSlug scheme
   const trackSlug = meta.trackSlug ?? pending?.plan_key ?? meta.planKey ?? "";
   const installmentCount = pending?.installment_count ?? parseInt(meta.installmentCount ?? "1", 10);
   const installmentAmount = pending?.installment_amount ?? (charge.amount / 100 / installmentCount);
   const totalAmountAed = pending?.total_amount_usd ?? (charge.amount / 100);
 
-  // Resolve internal tier from track slug (SmarThinkerz Academy scheme)
+  // Resolve internal tier from track slug (SmarThinkerz scheme)
   const resolvedTierFromTrack = tierFromTrackSlug(trackSlug);
   const legacyTierRaw = pending?.tier ?? meta.tier ?? "";
   const tier: Tier = resolvedTierFromTrack ?? (legacyTierRaw as Tier) ?? "basic";
@@ -224,7 +224,7 @@ async function handleCaptured(charge: TapChargeEvent): Promise<string> {
         tier,
         cycle: cycleLabel,
         trackSlug,
-        platform: meta.platform ?? "smarthinkerz-academy",
+        platform: meta.platform ?? "smarthinkerz",
         chargeId: charge.id,
         amountUsd: charge.amount / 100,
         installmentNumber: newInstallmentsPaid,
